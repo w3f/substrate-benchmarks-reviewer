@@ -7,17 +7,9 @@ use std::iter::Iterator;
 
 use failure::Error;
 
-/// Read file directly to memory. The output of an individual benchmark
-/// output is quite small, so reading the full thing will no create any
-/// issues.
-pub fn read_file<P: AsRef<Path>>(path: &Path) -> Result<String, Error> {
-    let mut file = File::open(path)?;
-    let mut contents = String::new();
-    file.read_to_string(&mut contents)?;
-    Ok(contents)
-}
+type ResultContent = String;
 
-struct FileCollector {
+pub struct FileCollector {
     files: Vec<PathBuf>,
     count: usize,
 }
@@ -50,12 +42,27 @@ impl FileCollector {
     }
 }
 
-impl Iterator for FileCollector {
-    type Item = PathBuf;
+/// Read file directly to memory. The output of an individual benchmark
+/// output is quite small, so reading the full thing will no create any
+/// issues.
+fn read_file<P: AsRef<Path>>(path: &Path) -> Result<String, Error> {
+    let mut file = File::open(path)?;
+    let mut contents = String::new();
+    file.read_to_string(&mut contents)?;
+    Ok(contents)
+}
 
-    fn next(&mut self) -> Option<PathBuf> {
-        let next = self.files.get(self.count).map(|e| e.clone());
+impl Iterator for FileCollector {
+    type Item = Result<ResultContent, Error>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let path = self.files.get(self.count).map(|e| e.clone());
         self.count += 1;
-        next
+
+        if let Some(path) = path {
+            return Some(read_file::<&Path>(path.as_path()))
+        }
+
+        None
     }
 }
