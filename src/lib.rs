@@ -16,22 +16,32 @@ pub fn read_file<P: AsRef<Path>>(path: &Path) -> Result<String, Error> {
     Ok(contents)
 }
 
-struct ResultsReader {
+struct FileCollector {
     files: Vec<PathBuf>,
 }
 
-impl ResultsReader {
-    pub fn new<P: AsRef<Path>>(target: &Path) -> Result<ResultsReader, Error> {
-        let files = fs::read_dir(target)?
-                .filter_map(|entry| entry.ok())
-                .map(|entry| entry.path())
-                .filter(|path| !path.is_dir())
-                .collect();
-
+impl FileCollector {
+    pub fn new<P: AsRef<Path>>(path: &Path) -> Result<FileCollector, Error> {
         Ok(
-            ResultsReader {
-                files: files,
+            FileCollector {
+                files: Self::find_files::<&Path>(path)?,
             }
         )
+    }
+    /// Search for files insides the specified `path` and collect all file paths. If a directory is found,
+    /// this function will repeat that same process for that subdirectory (recursion).
+    pub fn find_files<P: AsRef<Path>>(path: &Path) -> Result<Vec<PathBuf>, Error> {
+        let mut coll = Vec::new();
+
+        for entry in fs::read_dir(path)? {
+            let path = entry?.path();
+            if path.is_dir() {
+                coll.append(&mut Self::find_files::<&Path>(&path)?);
+            } else {
+                coll.push(path);
+            }
+        }
+
+        Ok(coll)
     }
 }
