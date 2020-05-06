@@ -3,6 +3,7 @@ use std::path::Path;
 use std::fs::{self, File};
 use std::io::prelude::*;
 use std::path::PathBuf;
+use std::iter::Iterator;
 
 use failure::Error;
 
@@ -18,19 +19,22 @@ pub fn read_file<P: AsRef<Path>>(path: &Path) -> Result<String, Error> {
 
 struct FileCollector {
     files: Vec<PathBuf>,
+    count: usize,
 }
 
 impl FileCollector {
+    /// Recursively searches for all files within the specified `path`, saving those internally.
     pub fn new<P: AsRef<Path>>(path: &Path) -> Result<FileCollector, Error> {
         Ok(
             FileCollector {
                 files: Self::find_files::<&Path>(path)?,
+                count: 0,
             }
         )
     }
-    /// Search for files insides the specified `path` and collect all file paths. If a directory is found,
+    /// Searches for files insides the specified `path` and collects all file paths. If a directory is found,
     /// this function will repeat that same process for that subdirectory (recursion).
-    pub fn find_files<P: AsRef<Path>>(path: &Path) -> Result<Vec<PathBuf>, Error> {
+    fn find_files<P: AsRef<Path>>(path: &Path) -> Result<Vec<PathBuf>, Error> {
         let mut coll = Vec::new();
 
         for entry in fs::read_dir(path)? {
@@ -43,5 +47,15 @@ impl FileCollector {
         }
 
         Ok(coll)
+    }
+}
+
+impl Iterator for FileCollector {
+    type Item = PathBuf;
+
+    fn next(&mut self) -> Option<PathBuf> {
+        let next = self.files.get(self.count).map(|e| e.clone());
+        self.count += 1;
+        next
     }
 }
