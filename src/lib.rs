@@ -5,6 +5,9 @@ use std::io::prelude::*;
 use std::path::PathBuf;
 use std::iter::Iterator;
 
+#[macro_use]
+extern crate failure;
+
 use failure::Error;
 
 type ResultContent = String;
@@ -65,4 +68,63 @@ impl Iterator for FileCollector {
 
         None
     }
+}
+
+pub struct BenchmarkAnalyser {
+
+}
+
+#[derive(Debug, Fail)]
+enum AnalyserError {
+    #[fail(display = "header value of the benchmark result is invalid")]
+    MissingHeader
+}
+
+use self::AnalyserError::*;
+
+impl BenchmarkAnalyser {
+    pub fn new() -> Self {
+        BenchmarkAnalyser {
+
+        }
+    }
+    /// Parses the header of the result file.
+    /// 
+    /// Example:
+    /// ```
+    /// Pallet: "balances", Extrinsic: "set_balance", Lowest values: [], Highest values: [], Steps: [10], Repeat: 10
+    /// u,e,extrinsic_time,storage_root_time
+    /// ```
+    pub fn parse_header(content: &ResultContent) -> Result<(), Error> {
+        let mut step_entry = StepEntry::default();
+
+        let lines: Vec<&str> = content
+            .lines()
+            .take(2)
+            .collect();
+
+        let bench_info = lines.get(0).ok_or(MissingHeader)?;
+
+        Ok(())
+    }
+}
+
+#[derive(Default)]
+struct StepEntry {
+    pallet: String,
+    extrinsic: String,
+    repeat_entries: Vec<RepeatEntry>,
+    steps: usize,
+    repeats: usize,
+}
+
+struct RepeatEntry {
+    input_vars: Vec<InputVar>,
+    extrinsic_time: u64,
+    storage_root_time: u64,
+}
+
+struct InputVar {
+    name: String,
+    value: usize
 }
