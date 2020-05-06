@@ -15,3 +15,4 @@ name = "substrate-benchmarks-analyzer"
 path = "src/bin/main.rs"
 
 [dependencies]
+failure = "0.1.8"
