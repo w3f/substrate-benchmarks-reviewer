@@ -12,13 +12,13 @@ extern crate failure;
 
 use failure::Error;
 
+pub struct FileContent(String);
 
-pub struct ResultContent(String);
-
-impl ResultContent {
-    pub fn parse(&self) -> Result<StepEntry, Error> {
+impl FileContent {
+    pub fn parse(&self) -> Result<ExtrinsicResult, Error> {
         let mut step_entry = parser::parse_header(self)?;
-        step_entry.repeat_entries = parser::parse_body(self, 5)?;
+        let expected_len = step_entry.input_var_names.len() + 2;
+        step_entry.repeat_entries = parser::parse_body(self, expected_len)?;
         Ok(step_entry)
     }
 }
@@ -57,15 +57,15 @@ impl FileCollector {
 /// Read file directly to memory. The output of an individual benchmark
 /// output is quite small, so reading the full thing will no create any
 /// issues.
-fn read_file<P: AsRef<Path>>(path: P) -> Result<ResultContent, Error> {
+fn read_file<P: AsRef<Path>>(path: P) -> Result<FileContent, Error> {
     let mut file = File::open(path)?;
     let mut contents = String::new();
     file.read_to_string(&mut contents)?;
-    Ok(ResultContent(contents))
+    Ok(FileContent(contents))
 }
 
 impl Iterator for FileCollector {
-    type Item = Result<ResultContent, Error>;
+    type Item = Result<FileContent, Error>;
 
     fn next(&mut self) -> Option<Self::Item> {
         let path = self.files.get(self.count).map(|e| e.clone());
@@ -80,17 +80,17 @@ impl Iterator for FileCollector {
 }
 
 #[derive(Default)]
-pub struct StepEntry {
+pub struct ExtrinsicResult {
     pallet: String,
     extrinsic: String,
-    repeat_entries: Vec<RepeatEntry>,
     steps: usize,
     repeats: usize,
     input_var_names: Vec<String>,
+    repeat_entries: Vec<RepeatEntry>,
 }
 
 #[derive(Default)]
-pub(crate) struct RepeatEntry {
+pub struct RepeatEntry {
     input_vars: Vec<usize>,
     extrinsic_time: u64,
     storage_root_time: u64,

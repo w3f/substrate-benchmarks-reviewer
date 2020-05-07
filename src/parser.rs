@@ -1,4 +1,4 @@
-use super::{ResultContent, StepEntry, RepeatEntry};
+use super::{RepeatEntry, FileContent, ExtrinsicResult};
 
 use failure::Error;
 
@@ -20,8 +20,8 @@ use self::AnalyserError::*;
 /// u,e,extrinsic_time,storage_root_time
 /// ```
 #[rustfmt::skip]
-pub(crate) fn parse_header(content: &ResultContent) -> Result<StepEntry, Error> {
-    let mut step_entry = StepEntry::default();
+pub(crate) fn parse_header(content: &FileContent) -> Result<ExtrinsicResult, Error> {
+    let mut step_entry = ExtrinsicResult::default();
 
     let lines: Vec<&str> = content.0.lines().take(2).collect();
 
@@ -95,7 +95,10 @@ pub(crate) fn parse_header(content: &ResultContent) -> Result<StepEntry, Error> 
     Ok(step_entry)
 }
 
-pub(crate) fn parse_body(content: &ResultContent, expected_len: usize) -> Result<Vec<RepeatEntry>, Error> {
+pub(crate) fn parse_body(
+    content: &FileContent,
+    expected_len: usize,
+) -> Result<Vec<RepeatEntry>, Error> {
     let mut coll = Vec::new();
     let lines: Vec<&str> = content.0.lines().skip(2).collect();
 
