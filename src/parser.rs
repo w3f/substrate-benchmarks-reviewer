@@ -20,7 +20,7 @@ use self::AnalyserError::*;
 /// u,e,extrinsic_time,storage_root_time
 /// ```
 #[rustfmt::skip]
-fn parse_header(content: &ResultContent) -> Result<StepEntry, Error> {
+pub(crate) fn parse_header(content: &ResultContent) -> Result<StepEntry, Error> {
     let mut step_entry = StepEntry::default();
 
     let lines: Vec<&str> = content.0.lines().take(2).collect();
@@ -54,7 +54,7 @@ fn parse_header(content: &ResultContent) -> Result<StepEntry, Error> {
         // Parse repeat amount. The amount does not have brackets around it,
         // probably skipped by accident. Generally not an issue, just a
         // small inconsistency.
-        step_entry.steps =
+        step_entry.repeats =
             check_requirements(parts[11], parts[12], "Repeat:", "", "")?
                 .parse::<usize>()
                 .map_err(|_| InvalidHeader)?;
@@ -79,7 +79,7 @@ fn parse_header(content: &ResultContent) -> Result<StepEntry, Error> {
             }
 
             // E.g. part = `u`
-            check(|| part.len() == 1);
+            check(|| part.len() == 1)?;
 
             offset += 1;
         }
@@ -95,7 +95,7 @@ fn parse_header(content: &ResultContent) -> Result<StepEntry, Error> {
     Ok(step_entry)
 }
 
-fn parse_body(content: &ResultContent, expected_len: usize) -> Result<Vec<RepeatEntry>, Error> {
+pub(crate) fn parse_body(content: &ResultContent, expected_len: usize) -> Result<Vec<RepeatEntry>, Error> {
     let mut coll = Vec::new();
     let lines: Vec<&str> = content.0.lines().skip(2).collect();
 

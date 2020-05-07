@@ -1,4 +1,4 @@
-pub mod parser;
+mod parser;
 
 use std::convert::AsRef;
 use std::fs::{self, File};
@@ -16,11 +16,11 @@ use failure::Error;
 pub struct ResultContent(String);
 
 impl ResultContent {
-    /*
-    pub fn parse() -> Result<StepEntry, Error> {
-        Ok()
+    pub fn parse(&self) -> Result<StepEntry, Error> {
+        let mut step_entry = parser::parse_header(self)?;
+        step_entry.repeat_entries = parser::parse_body(self, 5)?;
+        Ok(step_entry)
     }
-    */
 }
 
 pub struct FileCollector {
@@ -90,7 +90,7 @@ pub struct StepEntry {
 }
 
 #[derive(Default)]
-struct RepeatEntry {
+pub(crate) struct RepeatEntry {
     input_vars: Vec<usize>,
     extrinsic_time: u64,
     storage_root_time: u64,
