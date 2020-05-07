@@ -23,7 +23,7 @@ use self::AnalyserError::*;
 fn parse_header(content: &ResultContent) -> Result<StepEntry, Error> {
     let mut step_entry = StepEntry::default();
 
-    let lines: Vec<&str> = content.lines().take(2).collect();
+    let lines: Vec<&str> = content.0.lines().take(2).collect();
 
     // Parse the first line
     {
@@ -97,7 +97,7 @@ fn parse_header(content: &ResultContent) -> Result<StepEntry, Error> {
 
 fn parse_body(content: &ResultContent, expected_len: usize) -> Result<Vec<RepeatEntry>, Error> {
     let mut coll = Vec::new();
-    let lines: Vec<&str> = content.lines().skip(2).collect();
+    let lines: Vec<&str> = content.0.lines().skip(2).collect();
 
     for line in lines {
         let parts: Vec<&str> = line.split(",").collect();

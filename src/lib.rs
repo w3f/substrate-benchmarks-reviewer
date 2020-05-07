@@ -12,7 +12,16 @@ extern crate failure;
 
 use failure::Error;
 
-type ResultContent = String;
+
+pub struct ResultContent(String);
+
+impl ResultContent {
+    /*
+    pub fn parse() -> Result<StepEntry, Error> {
+        Ok()
+    }
+    */
+}
 
 pub struct FileCollector {
     files: Vec<PathBuf>,
@@ -48,11 +57,11 @@ impl FileCollector {
 /// Read file directly to memory. The output of an individual benchmark
 /// output is quite small, so reading the full thing will no create any
 /// issues.
-fn read_file<P: AsRef<Path>>(path: P) -> Result<String, Error> {
+fn read_file<P: AsRef<Path>>(path: P) -> Result<ResultContent, Error> {
     let mut file = File::open(path)?;
     let mut contents = String::new();
     file.read_to_string(&mut contents)?;
-    Ok(contents)
+    Ok(ResultContent(contents))
 }
 
 impl Iterator for FileCollector {
