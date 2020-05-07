@@ -87,9 +87,10 @@ pub struct StepEntry {
     repeat_entries: Vec<RepeatEntry>,
     steps: usize,
     repeats: usize,
-    input_var_names: Vec<String>
+    input_var_names: Vec<String>,
 }
 
+#[derive(Default)]
 struct RepeatEntry {
     input_vars: Vec<usize>,
     extrinsic_time: u64,
@@ -182,8 +183,43 @@ impl BenchmarkAnalyser {
 
         Ok(step_entry)
     }
-}
+    fn parse_body(content: &ResultContent, expected_len: usize) -> Result<Vec<RepeatEntry>, Error> {
+        let mut coll = Vec::new();
+        let lines: Vec<&str> = content.lines().skip(2).collect();
 
+        for line in lines {
+            let parts: Vec<&str> = line.split(",").collect();
+
+            // Must have the expected length:
+            // -> variables + "extrinsic_time" + "storage_root_time"
+            if parts.len() != expected_len || parts.len() < 2 {
+                break;
+            }
+
+            // All parts must be numeric
+            if parts.iter().all(|p| !p.parse::<usize>().is_ok()) {
+                break;
+            }
+
+            let mut repeat_entry = RepeatEntry::default();
+
+            // Fill in the data. The length and conversion validity is checked above,
+            // so directly indexing and unwrapping is safe here.
+            let temp: Vec<&&str> = parts.iter().rev().take(2).collect();
+            repeat_entry.storage_root_time = temp[0].parse::<u64>().unwrap();
+            repeat_entry.extrinsic_time = temp[1].parse::<u64>().unwrap();
+            repeat_entry.input_vars = parts
+                .iter()
+                .take(expected_len - 2)
+                .map(|p| p.parse::<usize>().unwrap())
+                .collect();
+
+            coll.push(repeat_entry);
+        }
+
+        Ok(coll)
+    }
+}
 
 /// Checks the requirements of the header (benchmark description) key and value.
 /// - input key
@@ -202,17 +238,12 @@ fn check_requirements(
     check(|| input_key == key_name)?;
 
     // E.g. ... starts with `"` and ends with `",`
-    check(|| {
-        input_val.starts_with(val_start) &&
-        input_val.ends_with(val_end)
-    })?;
+    check(|| input_val.starts_with(val_start) && input_val.ends_with(val_end))?;
 
     // E.g. from `"balances",` -> `balances`
-    Ok(
-        String::from(input_val)
-            .replace(val_start, "")
-            .replace(val_end, "")
-    )
+    Ok(String::from(input_val)
+        .replace(val_start, "")
+        .replace(val_end, ""))
 }
 
 fn check<F>(func: F) -> Result<(), Error>
