@@ -1,4 +1,4 @@
-use super::{RepeatEntry, FileContent, ExtrinsicResult};
+use super::{RepeatEntry, file_collector::FileContent, ExtrinsicResult};
 
 use failure::Error;
 
