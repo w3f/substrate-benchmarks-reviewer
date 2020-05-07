@@ -80,11 +80,27 @@ enum AnalyserError {
 
 use self::AnalyserError::*;
 
+#[derive(Default)]
+pub struct StepEntry {
+    pallet: String,
+    extrinsic: String,
+    repeat_entries: Vec<RepeatEntry>,
+    steps: usize,
+    repeats: usize,
+    input_var_names: Vec<String>
+}
+
+struct RepeatEntry {
+    input_vars: Vec<usize>,
+    extrinsic_time: u64,
+    storage_root_time: u64,
+}
+
 impl BenchmarkAnalyser {
     pub fn new() -> Self {
         BenchmarkAnalyser {}
     }
-    /// Parses the header of the result file. This function has strict requirements.
+    /// Parses the header of the result file. This function has slightly stricter requirements.
     ///
     /// Example:
     /// ```
@@ -92,7 +108,7 @@ impl BenchmarkAnalyser {
     /// u,e,extrinsic_time,storage_root_time
     /// ```
     #[rustfmt::skip]
-    pub fn parse_header(content: &ResultContent) -> Result<(), Error> {
+    pub fn parse_header(content: &ResultContent) -> Result<StepEntry, Error> {
         let mut step_entry = StepEntry::default();
 
         let lines: Vec<&str> = content.lines().take(2).collect();
@@ -105,33 +121,10 @@ impl BenchmarkAnalyser {
                 .split_whitespace()
                 .collect();
 
-            fn check_requirements(
-                input_key: &str,
-                input_val: &str,
-                key_name: &str,
-                len: usize,
-                val_start: &str,
-                val_end: &str,
-            ) -> Result<String, Error> {
-                // E.g. ... == "Pallet:"
-                check(|| input_key == key_name)?;
-
-                // E.g. ... starts with `"` and ends with `",`
-                check(|| {
-                    input_val.len() > len
-                        && input_val.starts_with(val_start)
-                        && input_val.ends_with(val_end)
-                })?;
-
-                // E.g. from `"balances",` -> `balances`
-                Ok(
-                    String::from(input_val)
-                        .replace(val_start, "")
-                        .replace(val_end, "")
-                )
-            }
-
             check(|| parts.len() == 13)?;
+
+            // check_requirements params:
+            // (input_key, input_val, min_val_length, starts_with, ends_with)
 
             // Parse pallet name
             step_entry.pallet =
@@ -148,7 +141,7 @@ impl BenchmarkAnalyser {
                     .map_err(|_| InvalidHeader)?;
 
             // Parse repeat amount. The amount does not have brackets around it,
-            // probably skipped by accident. Generally not an issue, just a 
+            // probably skipped by accident. Generally not an issue, just a
             // small inconsistency.
             step_entry.steps =
                 check_requirements(parts[11], parts[12], "Repeat:", 2, "", "")?
@@ -156,8 +149,66 @@ impl BenchmarkAnalyser {
                     .map_err(|_| InvalidHeader)?;
         }
 
-        Ok(())
+        // Parse second line
+        // u,e,extrinsic_time,storage_root_time
+        {
+            let parts: Vec<&str> = lines
+                .get(0)
+                .ok_or(MissingHeader)?
+                .split(",")
+                .collect();
+
+            check(|| parts.len() > 2)?;
+
+            let mut offset = 0;
+            for part in &parts {
+                if part == &"extrinsic_time" {
+                    break;
+                }
+
+                // E.g. part = `u`
+                check(|| part.len() == 1);
+
+                offset += 1;
+            }
+
+            for part in parts
+                .iter()
+                .take(offset)
+                .collect::<Vec<&&str>>()
+            {
+                step_entry.input_var_names.push(part.to_string());
+            }
+        }
+
+        Ok(step_entry)
     }
+}
+
+fn check_requirements(
+    input_key: &str,
+    input_val: &str,
+    key_name: &str,
+    len: usize,
+    val_start: &str,
+    val_end: &str,
+) -> Result<String, Error> {
+    // E.g. ... == "Pallet:"
+    check(|| input_key == key_name)?;
+
+    // E.g. ... starts with `"` and ends with `",`
+    check(|| {
+        input_val.len() > len
+            && input_val.starts_with(val_start)
+            && input_val.ends_with(val_end)
+    })?;
+
+    // E.g. from `"balances",` -> `balances`
+    Ok(
+        String::from(input_val)
+            .replace(val_start, "")
+            .replace(val_end, "")
+    )
 }
 
 fn check<F>(func: F) -> Result<(), Error>
@@ -169,24 +220,4 @@ where
     }
 
     Ok(())
-}
-
-#[derive(Default)]
-struct StepEntry {
-    pallet: String,
-    extrinsic: String,
-    repeat_entries: Vec<RepeatEntry>,
-    steps: usize,
-    repeats: usize,
-}
-
-struct RepeatEntry {
-    input_vars: Vec<InputVar>,
-    extrinsic_time: u64,
-    storage_root_time: u64,
-}
-
-struct InputVar {
-    name: String,
-    value: usize,
 }
