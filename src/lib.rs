@@ -121,22 +121,21 @@ impl BenchmarkAnalyser {
                 .split_whitespace()
                 .collect();
 
+            // Length is checked here, so directly indexing
+            // the vector after this is safe.
             check(|| parts.len() == 13)?;
-
-            // check_requirements params:
-            // (input_key, input_val, min_val_length, starts_with, ends_with)
 
             // Parse pallet name
             step_entry.pallet =
-                check_requirements(parts[0], parts[1], "Pallet:", 3, "\"", "\",")?;
+                check_requirements(parts[0], parts[1], "Pallet:", "\"", "\",")?;
 
             // Parse extrinsic name
             step_entry.extrinsic =
-                check_requirements(parts[2], parts[3], "Extrinsic:", 3, "\"", "\",")?;
+                check_requirements(parts[2], parts[3], "Extrinsic:", "\"", "\",")?;
 
             // Parse steps amount
             step_entry.steps =
-                check_requirements(parts[9], parts[10], "Steps:", 2, "[", "],")?
+                check_requirements(parts[9], parts[10], "Steps:", "[", "],")?
                     .parse::<usize>()
                     .map_err(|_| InvalidHeader)?;
 
@@ -144,21 +143,22 @@ impl BenchmarkAnalyser {
             // probably skipped by accident. Generally not an issue, just a
             // small inconsistency.
             step_entry.steps =
-                check_requirements(parts[11], parts[12], "Repeat:", 2, "", "")?
+                check_requirements(parts[11], parts[12], "Repeat:", "", "")?
                     .parse::<usize>()
                     .map_err(|_| InvalidHeader)?;
         }
 
         // Parse second line
-        // u,e,extrinsic_time,storage_root_time
         {
             let parts: Vec<&str> = lines
-                .get(0)
+                .get(1)
                 .ok_or(MissingHeader)?
                 .split(",")
                 .collect();
 
             check(|| parts.len() > 2)?;
+            check(|| parts.contains(&"extrinsic_time"))?;
+            check(|| parts.contains(&"storage_root_time"))?;
 
             let mut offset = 0;
             for part in &parts {
@@ -172,24 +172,29 @@ impl BenchmarkAnalyser {
                 offset += 1;
             }
 
-            for part in parts
+            parts
                 .iter()
                 .take(offset)
-                .collect::<Vec<&&str>>()
-            {
-                step_entry.input_var_names.push(part.to_string());
-            }
+                .for_each(|var| {
+                    step_entry.input_var_names.push(var.to_string())
+                });
         }
 
         Ok(step_entry)
     }
 }
 
+
+/// Checks the requirements of the header (benchmark description) key and value.
+/// - input key
+/// - input value
+/// - key must equal ...
+/// - value starts with ...
+/// - value ends with ...
 fn check_requirements(
     input_key: &str,
     input_val: &str,
     key_name: &str,
-    len: usize,
     val_start: &str,
     val_end: &str,
 ) -> Result<String, Error> {
@@ -198,9 +203,8 @@ fn check_requirements(
 
     // E.g. ... starts with `"` and ends with `",`
     check(|| {
-        input_val.len() > len
-            && input_val.starts_with(val_start)
-            && input_val.ends_with(val_end)
+        input_val.starts_with(val_start) &&
+        input_val.ends_with(val_end)
     })?;
 
     // E.g. from `"balances",` -> `balances`
