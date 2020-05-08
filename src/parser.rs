@@ -21,7 +21,7 @@ use self::AnalyserError::*;
 /// ```
 #[rustfmt::skip]
 pub(crate) fn parse_header(content: &FileContent) -> Result<ExtrinsicResult, Error> {
-    let mut step_entry = ExtrinsicResult::default();
+    let mut extrinsic_result = ExtrinsicResult::default();
 
     let lines: Vec<&str> = content.0.lines().take(2).collect();
 
@@ -38,15 +38,15 @@ pub(crate) fn parse_header(content: &FileContent) -> Result<ExtrinsicResult, Err
         check(|| parts.len() == 13)?;
 
         // Parse pallet name
-        step_entry.pallet =
+        extrinsic_result.pallet =
             check_requirements(parts[0], parts[1], "Pallet:", "\"", "\",")?;
 
         // Parse extrinsic name
-        step_entry.extrinsic =
+        extrinsic_result.extrinsic =
             check_requirements(parts[2], parts[3], "Extrinsic:", "\"", "\",")?;
 
         // Parse steps amount
-        step_entry.steps =
+        extrinsic_result.steps =
             check_requirements(parts[9], parts[10], "Steps:", "[", "],")?
                 .parse::<usize>()
                 .map_err(|_| InvalidHeader)?;
@@ -54,7 +54,7 @@ pub(crate) fn parse_header(content: &FileContent) -> Result<ExtrinsicResult, Err
         // Parse repeat amount. The amount does not have brackets around it,
         // probably skipped by accident. Generally not an issue, just a
         // small inconsistency.
-        step_entry.repeats =
+        extrinsic_result.repeats =
             check_requirements(parts[11], parts[12], "Repeat:", "", "")?
                 .parse::<usize>()
                 .map_err(|_| InvalidHeader)?;
@@ -88,11 +88,11 @@ pub(crate) fn parse_header(content: &FileContent) -> Result<ExtrinsicResult, Err
             .iter()
             .take(offset)
             .for_each(|var| {
-                step_entry.input_var_names.push(var.to_string())
+                extrinsic_result.input_var_names.push(var.to_string())
             });
     }
 
-    Ok(step_entry)
+    Ok(extrinsic_result)
 }
 
 pub(crate) fn parse_body(

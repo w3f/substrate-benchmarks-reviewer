@@ -13,10 +13,10 @@ pub struct FileContent(pub(crate) String);
 
 impl FileContent {
     pub fn parse(&self) -> Result<ExtrinsicResult, Error> {
-        let mut step_entry = parser::parse_header(self)?;
-        let expected_len = step_entry.input_var_names.len() + 2;
-        step_entry.repeat_entries = parser::parse_body(self, expected_len)?;
-        Ok(step_entry)
+        let mut extrinsic_result = parser::parse_header(self)?;
+        let expected_len = extrinsic_result.input_var_names.len() + 2;
+        extrinsic_result.repeat_entries = parser::parse_body(self, expected_len)?;
+        Ok(extrinsic_result)
     }
 }
 
