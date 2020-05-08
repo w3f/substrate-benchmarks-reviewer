@@ -1,4 +1,4 @@
-use super::{ExtrinsicResult, parser};
+use super::{parser, ExtrinsicResult};
 
 use std::convert::AsRef;
 use std::fs::{self, File};

@@ -1,7 +1,7 @@
 pub mod file_collector;
 mod parser;
 
-pub use file_collector::{FileContent, FileCollector};
+pub use file_collector::{FileCollector, FileContent};
 
 #[macro_use]
 extern crate failure;
@@ -22,4 +22,3 @@ pub struct RepeatEntry {
     extrinsic_time: u64,
     storage_root_time: u64,
 }
-
