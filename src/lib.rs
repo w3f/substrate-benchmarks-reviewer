@@ -33,3 +33,18 @@ impl ExtrinsicResult {
         (0 as f64 / self.repeat_entries.len() as f64)
     }
 }
+
+pub struct ExtrinsicCollection {
+    inner: Vec<ExtrinsicResult>,
+}
+
+impl ExtrinsicCollection {
+    pub fn new() -> Self {
+        ExtrinsicCollection {
+            inner: Vec::new(),
+        }
+    }
+    pub fn add(&mut self, result: ExtrinsicResult) {
+        self.inner.push(result);
+    }
+}
