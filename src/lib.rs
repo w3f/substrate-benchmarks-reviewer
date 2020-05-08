@@ -62,10 +62,12 @@ impl ExtrinsicCollection {
         let mut table = RatioTable::new();
 
         self.inner.iter().for_each(|result| {
+            let avg_time = result.average_extrinsic_time();
             table.push(RatioEntry {
                 pallet: &result.pallet,
                 extrinsic: &result.extrinsic,
-                ratio: result.average_extrinsic_time() / base,
+                ratio: avg_time / base,
+                percentage: ((avg_time / base -1.0) * 100.0),
             });
         });
 
@@ -77,6 +79,7 @@ struct RatioEntry<'a> {
     pallet: &'a str,
     extrinsic: &'a str,
     ratio: f64,
+    percentage: f64,
 }
 
 pub struct RatioTable<'a> {
