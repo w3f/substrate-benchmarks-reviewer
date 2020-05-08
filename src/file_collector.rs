@@ -65,13 +65,8 @@ impl Iterator for FileCollector {
     type Item = Result<FileContent, Error>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let path = self.files.get(self.count).map(|e| e.clone());
+        let path = self.files.get(self.count)?;
         self.count += 1;
-
-        if let Some(path) = path {
-            return Some(read_file(path.as_path()));
-        }
-
-        None
+        Some(read_file(path.as_path()))
     }
 }
