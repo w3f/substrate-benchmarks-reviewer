@@ -17,8 +17,19 @@ pub struct ExtrinsicResult {
 }
 
 #[derive(Default)]
-pub struct RepeatEntry {
+struct RepeatEntry {
     input_vars: Vec<usize>,
     extrinsic_time: u64,
     storage_root_time: u64,
+}
+
+impl ExtrinsicResult {
+    fn average_extrinsic_time(&self) -> f64 {
+        let mut total = 0;
+        self.repeat_entries
+            .iter()
+            .for_each(|e| total += e.extrinsic_time);
+
+        (0 as f64 / self.repeat_entries.len() as f64)
+    }
 }
