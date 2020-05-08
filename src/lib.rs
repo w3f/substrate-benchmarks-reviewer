@@ -40,11 +40,54 @@ pub struct ExtrinsicCollection {
 
 impl ExtrinsicCollection {
     pub fn new() -> Self {
-        ExtrinsicCollection {
-            inner: Vec::new(),
-        }
+        ExtrinsicCollection { inner: Vec::new() }
     }
-    pub fn add(&mut self, result: ExtrinsicResult) {
+    pub fn push(&mut self, result: ExtrinsicResult) {
         self.inner.push(result);
+    }
+    pub fn generate_ratio_table(&self) -> RatioTable {
+        // find base (lowest value)
+        // TODO: Handle unwrap
+        let base = self
+            .inner
+            .iter()
+            .min_by(|x, y| {
+                x.average_extrinsic_time()
+                    .partial_cmp(&y.average_extrinsic_time())
+                    .unwrap()
+            })
+            .unwrap()
+            .average_extrinsic_time();
+
+        let mut table = RatioTable::new();
+
+        self.inner.iter().for_each(|result| {
+            table.push(RatioEntry {
+                pallet: &result.pallet,
+                extrinsic: &result.extrinsic,
+                ratio: result.average_extrinsic_time() / base,
+            });
+        });
+
+        table
+    }
+}
+
+struct RatioEntry<'a> {
+    pallet: &'a str,
+    extrinsic: &'a str,
+    ratio: f64,
+}
+
+pub struct RatioTable<'a> {
+    inner: Vec<RatioEntry<'a>>,
+}
+
+impl<'a> RatioTable<'a> {
+    pub fn new() -> Self {
+        RatioTable { inner: Vec::new() }
+    }
+    fn push(&mut self, entry: RatioEntry<'a>) {
+        self.inner.push(entry);
     }
 }
