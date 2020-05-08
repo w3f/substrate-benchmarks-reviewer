@@ -67,7 +67,7 @@ impl ExtrinsicCollection {
                 pallet: &result.pallet,
                 extrinsic: &result.extrinsic,
                 ratio: avg_time / base,
-                percentage: ((avg_time / base -1.0) * 100.0),
+                percentage: ((avg_time / base - 1.0) * 100.0),
             });
         });
 
@@ -92,5 +92,13 @@ impl<'a> RatioTable<'a> {
     }
     fn push(&mut self, entry: RatioEntry<'a>) {
         self.inner.push(entry);
+    }
+    fn sort_by_ratio(&mut self) {
+        // TODO: Handle unwrap
+        self.inner
+            .sort_by(|a, b| a.ratio.partial_cmp(&b.ratio).unwrap());
+    }
+    fn sort_by_pallet(&mut self) {
+        // TODO...
     }
 }
