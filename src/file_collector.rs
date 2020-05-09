@@ -26,15 +26,17 @@ pub struct FileCollector {
 }
 
 impl FileCollector {
-    /// Recursively searches for all files within the specified `path`, saving those internally.
+    /// Recursively searches for all files within the specified `path`,
+    /// saving those internally.
     pub fn new<P: AsRef<Path>>(path: P) -> Result<FileCollector, Error> {
         Ok(FileCollector {
             files: Self::find_files(path)?,
             count: 0,
         })
     }
-    /// Searches for files insides the specified `path` and collects all file paths. If a directory is found,
-    /// this function will repeat that same process for that subdirectory (recursion).
+    /// Searches for files insides the specified `path` and collects all file paths.
+    /// If a directory is found, this function will repeat that same process for that
+    /// subdirectory (recursion).
     fn find_files<P: AsRef<Path>>(path: P) -> Result<Vec<PathBuf>, Error> {
         let mut coll = Vec::new();
 
