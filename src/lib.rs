@@ -6,7 +6,7 @@ pub use file_collector::{FileCollector, FileContent};
 #[macro_use]
 extern crate failure;
 
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct ExtrinsicResult {
     pallet: String,
     extrinsic: String,
@@ -16,9 +16,9 @@ pub struct ExtrinsicResult {
     repeat_entries: Vec<RepeatEntry>,
 }
 
-#[derive(Default)]
+#[derive(Debug, Default)]
 struct RepeatEntry {
-    input_vars: Vec<usize>,
+    input_vars: Vec<u64>,
     extrinsic_time: u64,
     storage_root_time: u64,
 }

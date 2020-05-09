@@ -126,7 +126,7 @@ pub(crate) fn parse_body(
         repeat_entry.input_vars = parts
             .iter()
             .take(expected_len - 2)
-            .map(|p| p.parse::<usize>().unwrap())
+            .map(|p| p.parse::<u64>().unwrap())
             .collect();
 
         coll.push(repeat_entry);
@@ -179,7 +179,7 @@ mod tests {
     use crate::{FileContent, ExtrinsicResult};
 
     #[test]
-    fn parse_header_test() {
+    fn test_parse_header() {
         let test_data = [
             (
                 // Input (str1 + str2)
@@ -224,7 +224,73 @@ mod tests {
             let mut counter = 0;
             for var in &output.4 {
                 assert_eq!(&res.input_var_names[counter], var);
-                counter+=1;
+                counter += 1;
+            }
+        }
+    }
+
+    #[test]
+    fn test_parse_body() {
+        let test_data = [
+            (
+                (
+                    "header1 ... (skipped)\n\
+                    header2 ... (skpped)\n\
+                    1,100,409567,85176\n\
+                    1,100,404202,95485\n\
+                    1,100,436160,89604\n\
+                    1,100,443911,106889\n\
+                    1,100,441193,93017\n\
+                    1,100,419524,94390"
+                ),
+                vec![
+                    vec![1,100,409567,85176],
+                    vec![1,100,404202,95485],
+                    vec![1,100,436160,89604],
+                    vec![1,100,443911,106889],
+                    vec![1,100,441193,93017],
+                    vec![1,100,419524,94390]
+                ]
+            ),
+            (
+                (
+                    "header1 ... (skipped)\n\
+                    header2 ... (skpped)\n\
+                    20,100,416389,88954\n\
+                    20,100,411389,88545\n\
+                    20,100,410049,88203\n\
+                    20,1,127985,70742\n\
+                    20,1,133206,72225\n\
+                    20,1,140801,71239"
+                ),
+                vec![
+                    vec![20,100,416389,88954],
+                    vec![20,100,411389,88545],
+                    vec![20,100,410049,88203],
+                    vec![20,1,127985,70742],
+                    vec![20,1,133206,72225],
+                    vec![20,1,140801,71239]
+                ]
+            )
+        ];
+
+        for (content, output) in &test_data {
+            let content = FileContent(String::from(*content));
+            let expected_len = output[0].len();
+            let res = parse_body(&content, expected_len).unwrap();
+
+            let mut counter = 0;
+            for entry in res {
+                println!("{:?}", entry);
+
+                let current = &output[counter];
+                for i in 0..expected_len-2 {
+                    assert_eq!(entry.input_vars[i], current[i]);
+                }
+
+                assert_eq!(entry.extrinsic_time, current[expected_len-2]);
+                assert_eq!(entry.storage_root_time, current[expected_len-1]);
+                counter += 1;
             }
         }
     }
