@@ -1,0 +1,40 @@
+Pallet: "staking", Extrinsic: "bond_extra", Lowest values: [], Highest values: [], Steps: [10], Repeat: 10
+u,extrinsic_time,storage_root_time
+400,181414,117638
+400,196480,118778
+400,186838,117473
+
+Median Slopes Analysis
+========
+
+Model:
+Time ~=    185.7
+    + u        0
+              µs
+
+Min Squares Analysis
+========
+
+Data points distribution:
+    u   mean µs  sigma µs       %
+    0     186.9     6.314    3.3%
+  100     187.1     1.848    0.9%
+  200     181.9     2.323    1.2%
+  300     186.8      1.65    0.8%
+  400     184.2     3.201    1.7%
+  500     186.4     1.863    0.9%
+  600     182.3     1.996    1.0%
+  700     187.5     2.169    1.1%
+  800     186.1     1.816    0.9%
+  900     185.7     2.256    1.2%
+ 1000     182.9       2.1    1.1%
+
+Quality and confidence:
+param     error
+u         0.001
+
+Model:
+Time ~=    185.9
+    + u        0
+              µs
+

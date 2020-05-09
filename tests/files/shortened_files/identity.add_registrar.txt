@@ -1,0 +1,50 @@
+Pallet: "identity", Extrinsic: "add_registrar", Lowest values: [], Highest values: [], Steps: [10], Repeat: 10
+r,extrinsic_time,storage_root_time
+1,92036,48615
+1,72925,43011
+1,73037,39542
+1,71647,47537
+1,73359,40667
+
+Median Slopes Analysis
+========
+
+Model:
+Time ~=    72.63
+    + r    0.904
+              µs
+
+Min Squares Analysis
+========
+
+Data points distribution:
+    r   mean µs  sigma µs       %
+    1     72.86     0.506    0.6%
+    2     74.16     0.148    0.1%
+    3      73.3     0.419    0.5%
+    4      77.6     2.442    3.1%
+    5     77.49     0.515    0.6%
+    6     80.14      1.76    2.1%
+    7      81.1     1.268    1.5%
+    8     80.94     0.325    0.4%
+    9     80.96      0.54    0.6%
+   10     81.29     0.424    0.5%
+   11     82.22      0.51    0.6%
+   12     83.53     0.635    0.7%
+   13     84.58     0.936    1.1%
+   14      84.3     0.739    0.8%
+   15      85.5     0.569    0.6%
+   16     87.36     0.335    0.3%
+   17     87.28     0.661    0.7%
+   18     89.01     0.775    0.8%
+   19     90.78     0.423    0.4%
+
+Quality and confidence:
+param     error
+r         0.023
+
+Model:
+Time ~=    72.86
+    + r    0.895
+              µs
+
