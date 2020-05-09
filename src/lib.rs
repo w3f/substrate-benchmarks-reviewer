@@ -110,6 +110,18 @@ impl<'a> OverviewTable<'a> {
     fn push(&mut self, entry: RatioEntry<'a>) {
         self.inner.push(entry);
     }
+    /// Returns a list of the entries.
+    ///
+    /// Signature: `(Pallet, Extrinsic, Ratio, Percentage)`
+    ///
+    /// # Example output:
+    /// ```
+    /// vec![
+    ///     ("identity", "add_registrar", 1.0, 0.0),
+    ///     ("treasury", "tip_new", 1.8363, 83.6271),
+    ///     ("balances", "transfer", 2.4501, 145.0108),
+    /// ];
+    /// ```
     pub fn list(&self) -> Vec<(&str, &str, f64, f64)> {
         self.inner
             .iter()
