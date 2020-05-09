@@ -110,6 +110,12 @@ impl<'a> OverviewTable<'a> {
     fn push(&mut self, entry: RatioEntry<'a>) {
         self.inner.push(entry);
     }
+    pub fn list(&self) -> Vec<(&str, &str, f64, f64)> {
+        self.inner
+            .iter()
+            .map(|e| (e.pallet, e.extrinsic, e.ratio, e.percentage))
+            .collect()
+    }
     pub fn sort_by_ratio(&mut self) {
         // TODO: Handle unwrap
         self.inner
