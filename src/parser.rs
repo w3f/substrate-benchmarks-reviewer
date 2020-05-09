@@ -271,6 +271,26 @@ mod tests {
                     vec![20,1,133206,72225],
                     vec![20,1,140801,71239]
                 ]
+            ),
+            (
+                (
+                    "header1 ... (skipped)\n\
+                    header2 ... (skpped)\n\
+                    50,87726,90501\n\
+                    50,229949,111762\n\
+                    60,96437,87721\n\
+                    60,87618,83273\n\
+                    60,97325,232905\n\
+                    60,117408,116346"
+                ),
+                vec![
+                    vec![50,87726,90501],
+                    vec![50,229949,111762],
+                    vec![60,96437,87721],
+                    vec![60,87618,83273],
+                    vec![60,97325,232905],
+                    vec![60,117408,116346]
+                ]
             )
         ];
 
@@ -281,7 +301,11 @@ mod tests {
 
             let mut counter = 0;
             for entry in res {
-                println!("{:?}", entry);
+                // println!("{:?}", entry);
+
+                // Hint: the other two values are `extrinsic_time`
+                // and `storage_root_time`
+                assert_eq!(entry.input_vars.len(), expected_len-2);
 
                 let current = &output[counter];
                 for i in 0..expected_len-2 {
