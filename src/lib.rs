@@ -119,23 +119,34 @@ impl<'a> OverviewTable<'a> {
         // TODO...
     }
     pub fn print_entries(&self) {
+        let width = 14;
+
         // Print table header
         println!(
-            "|{:<14}|{:<14}|{:<14}|{:<14}|",
-            "Pallet", "Extrinsic", "Ratio", "Increase"
+            "|{:^width$}|{:^width$}|{:^width$}|{:^width$}|",
+            "Pallet",
+            "Extrinsic",
+            "Ratio",
+            "Increase",
+            width = width
         );
 
         // Print line
         for _ in 0..4 {
-            print!("|{:-<14}", "");
+            print!("|{:-<width$}", "", width = width);
         }
         println!("|");
 
         // Print table body
         for entry in &self.inner {
             println!(
-                "|{:<14}|{:<14}|{:<14}|{:>12} %|",
-                entry.pallet, entry.extrinsic, entry.ratio, entry.percentage
+                "|{:<width$}|{:<width$}|{:<width$}|{:>width_incr$} %|",
+                entry.pallet,
+                entry.extrinsic,
+                entry.ratio,
+                entry.percentage,
+                width = width,
+                width_incr = width - 2
             );
         }
     }
