@@ -176,7 +176,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{ExtrinsicResult, FileContent};
+    use crate::FileContent;
 
     #[test]
     fn test_parse_header() {
