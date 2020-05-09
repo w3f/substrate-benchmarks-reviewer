@@ -146,7 +146,16 @@ impl<'a> OverviewTable<'a> {
     pub fn list(&self) -> Vec<(&str, &str, f64, f64, f64, f64)> {
         self.inner
             .iter()
-            .map(|e| (e.pallet, e.extrinsic, e.avg_extrinsic_time, e.avg_storage_root_time, e.ratio, e.percentage))
+            .map(|e| {
+                (
+                    e.pallet,
+                    e.extrinsic,
+                    e.avg_extrinsic_time,
+                    e.avg_storage_root_time,
+                    e.ratio,
+                    e.percentage,
+                )
+            })
             .collect()
     }
     pub fn sort_by_ratio(&mut self) {

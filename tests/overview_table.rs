@@ -5,6 +5,7 @@ use analyzer::{ExtrinsicCollection, FileCollector};
 use failure::Error;
 
 #[test]
+#[rustfmt::skip]
 /// Tests if it can read the full files as they're generated
 /// by the substrate benchmark binary.
 fn test_overview_table_full_files() -> Result<(), Error> {
@@ -47,8 +48,9 @@ fn test_overview_table_full_files() -> Result<(), Error> {
     Ok(())
 }
 
-/// Test shortened files, where the expected results have been re-calculated by hand.
 #[test]
+#[rustfmt::skip]
+/// Test shortened files, where the expected results have been re-calculated by hand.
 fn test_overview_table_shortened() -> Result<(), Error> {
     let collector = FileCollector::new("tests/files/shortened_files/")?;
     let mut collection = ExtrinsicCollection::new();
