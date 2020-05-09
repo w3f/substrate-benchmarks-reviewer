@@ -36,9 +36,9 @@ impl FileCollector {
     }
 }
 
-/// Searches for files insides the specified `path` and saves the full path of each file.
-/// If a directory is found, this function will repeat that same process for that
-/// subdirectory (recursion).
+/// Searches for files insides the specified `path` and saves the full path of each
+/// file. If a directory is found, this function will repeat that same process for
+/// that subdirectory (recursion).
 fn find_files<P: AsRef<Path>>(path: P) -> Result<Vec<PathBuf>, Error> {
     let mut coll = Vec::new();
 
