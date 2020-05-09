@@ -46,6 +46,17 @@ impl ExtrinsicResult {
 
         (total as f64 / self.repeat_entries.len() as f64)
     }
+    // TODO: Ensure each generated average uses the same amount
+    // of entries as the data it gets compared to.
+    // TODO: Ensure length is never 0.
+    fn average_storage_root_time(&self) -> f64 {
+        let mut total = 0;
+        self.repeat_entries
+            .iter()
+            .for_each(|e| total += e.storage_root_time);
+
+        (total as f64 / self.repeat_entries.len() as f64)
+    }
 }
 
 #[derive(Debug)]
@@ -81,6 +92,8 @@ impl ExtrinsicCollection {
             table.push(RatioEntry {
                 pallet: &result.pallet,
                 extrinsic: &result.extrinsic,
+                avg_extrinsic_time: avg_time.round_by(4),
+                avg_storage_root_time: result.average_storage_root_time().round_by(4),
                 ratio: (avg_time / base).round_by(4),
                 percentage: ((avg_time / base - 1.0) * 100.0).round_by(4),
             });
@@ -99,6 +112,8 @@ pub struct OverviewTable<'a> {
 struct RatioEntry<'a> {
     pallet: &'a str,
     extrinsic: &'a str,
+    avg_extrinsic_time: f64,
+    avg_storage_root_time: f64,
     ratio: f64,
     percentage: f64,
 }
@@ -112,7 +127,13 @@ impl<'a> OverviewTable<'a> {
     }
     /// Returns a list of the entries.
     ///
-    /// Signature: `(Pallet, Extrinsic, Ratio, Percentage)`
+    /// Data ordered as:
+    /// - pallet
+    /// - extrinsic
+    /// - average extrinsic time
+    /// - average storage root time
+    /// - ratio
+    /// - percentage
     ///
     /// # Example output:
     /// ```
@@ -122,10 +143,10 @@ impl<'a> OverviewTable<'a> {
     ///     ("balances", "transfer", 2.4501, 145.0108),
     /// ];
     /// ```
-    pub fn list(&self) -> Vec<(&str, &str, f64, f64)> {
+    pub fn list(&self) -> Vec<(&str, &str, f64, f64, f64, f64)> {
         self.inner
             .iter()
-            .map(|e| (e.pallet, e.extrinsic, e.ratio, e.percentage))
+            .map(|e| (e.pallet, e.extrinsic, e.avg_extrinsic_time, e.avg_storage_root_time, e.ratio, e.percentage))
             .collect()
     }
     pub fn sort_by_ratio(&mut self) {
