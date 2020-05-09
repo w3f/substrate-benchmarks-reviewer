@@ -4,7 +4,7 @@ mod parser;
 
 pub use file_collector::{FileCollector, FileContent};
 
-use tables::{OverviewTable, TableEntry};
+use tables::{OverviewTable, TableEntry, StepOverviewTable, StepTableEntry};
 
 #[macro_use]
 extern crate failure;
@@ -104,4 +104,58 @@ impl ExtrinsicCollection {
 
         table
     }
+    pub fn generate_step_table(&self) -> StepOverviewTable {
+        use std::collections::HashMap;
+
+        let mut db: HashMap<(&str, &str, &Vec<u64>), (usize, u64, u64)> = HashMap::new();
+
+        for result in &self.inner {
+            for entry in &result.repeat_entries {
+                db.entry((&result.pallet, &result.extrinsic, &entry.input_vars))
+                    .and_modify(|(count, extrinsic_time, storage_root_time)| {
+                        *count += 1;
+                        *extrinsic_time += entry.extrinsic_time;
+                        *storage_root_time += entry.storage_root_time;
+                    })
+                    .or_insert((0, 0, 0));
+            }
+        }
+
+        let mut table = StepOverviewTable;
+        for (key, value) in db {
+
+        }
+
+        StepOverviewTable::new()
+    }
 }
+
+/*
+#[derive(Debug, Default)]
+pub struct ExtrinsicResult {
+    pallet: String,
+    extrinsic: String,
+    steps: usize,
+    repeats: usize,
+    input_var_names: Vec<String>,
+    repeat_entries: Vec<RepeatEntry>,
+}
+
+trait RoundBy {
+    fn round_by(&self, by: i32) -> Self;
+}
+
+impl RoundBy for f64 {
+    fn round_by(&self, by: i32) -> Self {
+        let precision = 10.0_f64.powi(by);
+        (self * precision).round() / precision
+    }
+}
+
+#[derive(Debug, Default)]
+struct RepeatEntry {
+    input_vars: Vec<u64>,
+    extrinsic_time: u64,
+    storage_root_time: u64,
+}
+*/

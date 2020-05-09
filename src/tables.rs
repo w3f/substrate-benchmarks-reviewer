@@ -94,3 +94,31 @@ impl<'a> OverviewTable<'a> {
         }
     }
 }
+
+#[derive(Debug)]
+pub struct StepOverviewTable<'a> {
+    inner: Vec<StepTableEntry<'a>>
+}
+
+#[derive(Debug)]
+pub(crate) struct StepTableEntry<'a> {
+    pub pallet: &'a str,
+    pub extrinsic: &'a str,
+    pub steps: Vec<SingleStep>,
+}
+
+#[derive(Debug)]
+pub(crate) struct SingleStep {
+    pub avg_extrinsic_time: f64,
+    pub avg_storage_root_time: f64,
+    pub percentage: f64,
+}
+
+impl<'a> StepOverviewTable<'a> {
+    pub fn new() -> Self {
+        StepOverviewTable { inner: Vec::new() }
+    }
+    pub(crate) fn push(&mut self, entry: StepTableEntry<'a>) {
+        self.inner.push(entry);
+    }
+}
