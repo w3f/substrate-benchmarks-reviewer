@@ -38,16 +38,16 @@ fn test_overview_table_full_files() -> Result<(), Error> {
 
         counter += 1;
     }
-    
+
     //table.print_entries();
 
     Ok(())
 }
 
-/*
+/// Test shortened files, where the expected results have been recalculated by hand.
 #[test]
 fn test_overview_table_shortened() -> Result<(), Error> {
-    let collector = FileCollector::new("tests/files/")?;
+    let collector = FileCollector::new("tests/files/shortened_files/")?;
     let mut collection = ExtrinsicCollection::new();
 
     for result in collector {
@@ -57,8 +57,28 @@ fn test_overview_table_shortened() -> Result<(), Error> {
 
     let mut table = collection.generate_overview_table();
     table.sort_by_ratio();
-    // table.print_entries();
+
+    let expected = [
+        ("identity", "add_registrar", 1.0, 0.0),
+        ("treasury", "tip_new", 1.8363, 83.6271),
+        ("balances", "transfer", 2.4501, 145.0108),
+        ("staking", "bond_extra", 2.4575, 145.7468),
+        ("democracy", "delegate", 19.6006, 1860.0573)
+    ];
+
+
+    let mut counter = 0;
+    let list = table.list();
+    for entry in list {
+        assert_eq!(entry.0, expected[counter].0);
+        assert_eq!(entry.1, expected[counter].1);
+        assert_eq!(entry.2, expected[counter].2);
+        assert_eq!(entry.3, expected[counter].3);
+
+        counter += 1;
+    }
+
+    //table.print_entries();
 
     Ok(())
 }
-*/
