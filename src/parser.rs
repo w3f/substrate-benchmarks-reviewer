@@ -15,7 +15,7 @@ use self::AnalyserError::*;
 /// Parses the header of the result file. This function has slightly stricter requirements.
 ///
 /// Example:
-/// ```
+/// ```txt
 /// Pallet: "balances", Extrinsic: "set_balance", Lowest values: [], Highest values: [], Steps: [10], Repeat: 10
 /// u,e,extrinsic_time,storage_root_time
 /// ```
@@ -35,7 +35,7 @@ pub(crate) fn parse_header(content: &FileContent) -> Result<ExtrinsicResult, Err
 
         // Length is checked here, so directly indexing
         // the vector after this is safe.
-        check(|| parts.len() == 13)?;
+        check(|| parts.len() == 14)?;
 
         // Parse pallet name
         extrinsic_result.pallet =
@@ -47,7 +47,7 @@ pub(crate) fn parse_header(content: &FileContent) -> Result<ExtrinsicResult, Err
 
         // Parse steps amount
         extrinsic_result.steps =
-            check_requirements(parts[9], parts[10], "Steps:", "[", "],")?
+            check_requirements(parts[10], parts[11], "Steps:", "[", "],")?
                 .parse::<usize>()
                 .map_err(|_| InvalidHeader)?;
 
@@ -55,7 +55,7 @@ pub(crate) fn parse_header(content: &FileContent) -> Result<ExtrinsicResult, Err
         // probably skipped by accident. Generally not an issue, just a
         // small inconsistency.
         extrinsic_result.repeats =
-            check_requirements(parts[11], parts[12], "Repeat:", "", "")?
+            check_requirements(parts[12], parts[13], "Repeat:", "", "")?
                 .parse::<usize>()
                 .map_err(|_| InvalidHeader)?;
     }
@@ -136,10 +136,11 @@ pub(crate) fn parse_body(
 }
 
 /// Checks the requirements of the header (benchmark description) key and value.
+/// Returns the parsed value. Parameters:
 /// - input key
 /// - input value
 /// - key must equal ...
-/// - value starts with ...
+/// - value starts with ... (gets removed)
 /// - value ends with ...
 fn check_requirements(
     input_key: &str,
@@ -157,7 +158,8 @@ fn check_requirements(
     // E.g. from `"balances",` -> `balances`
     Ok(String::from(input_val)
         .replace(val_start, "")
-        .replace(val_end, ""))
+        .replace(val_end, "")
+        .replace(",", "")) // Remove any tangling comma
 }
 
 fn check<F>(func: F) -> Result<(), Error>
@@ -169,4 +171,61 @@ where
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{FileContent, ExtrinsicResult};
+
+    #[test]
+    fn parse_header_test() {
+        let test_data = [
+            (
+                // Input (str1 + str2)
+                (
+                    r#"Pallet: "balances", Extrinsic: "set_balance", Lowest values: [], Highest values: [], Steps: [10], Repeat: 10"#,
+                    r#"u,e,extrinsic_time,storage_root_time"#,
+                ),
+                // -> output to be tested
+                ("balances", "set_balance", 10, 10, vec!["u", "e"])
+            ),
+            (
+                (
+                    r#"Pallet: "democracy", Extrinsic: "delegate", Lowest values: [], Highest values: [], Steps: [10], Repeat: 10"#,
+                    r#"r,extrinsic_time,storage_root_time"#
+                ),
+                ("democracy", "delegate", 10, 10, vec!["r"])
+            ),
+            (
+                (
+                    r#"Pallet: "democracy", Extrinsic: "proxy_undelegate", Lowest values: [], Highest values: [], Steps: [20], Repeat: 20"#,
+                    r#"r,extrinsic_time,storage_root_time"#
+                ),
+                ("democracy", "proxy_undelegate", 20, 20, vec!["r"])
+            ),
+            (
+                (
+                    r#"Pallet: "identity", Extrinsic: "cancel_request", Lowest values: [], Highest values: [], Steps: [20], Repeat: 20"#,
+                    r#"r,x,extrinsic_time,storage_root_time"#
+                ),
+                ("identity", "cancel_request", 20, 20, vec!["r", "x"])
+            ),
+        ];
+
+        for ((str1, str2), output) in &test_data {
+            let content = FileContent(format!("{}\n{}", str1, str2));
+            let res = parse_header(&content).unwrap();
+            assert_eq!(res.pallet, output.0);
+            assert_eq!(res.extrinsic, output.1);
+            assert_eq!(res.steps, output.2);
+            assert_eq!(res.repeats, output.3);
+
+            let mut counter = 0;
+            for var in &output.4 {
+                assert_eq!(&res.input_var_names[counter], var);
+                counter+=1;
+            }
+        }
+    }
 }
