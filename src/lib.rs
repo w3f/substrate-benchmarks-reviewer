@@ -121,18 +121,20 @@ impl<'a> RatioTable<'a> {
     pub fn print_entries(&self) {
         // Print table header
         println!(
-            "|{:<15}|{:<15}|{:<15}|{:<15}|",
-            "Pallet", "Extrinsic", "Ratio", "Percentage"
+            "|{:<14}|{:<14}|{:<14}|{:<14}|",
+            "Pallet", "Extrinsic", "Ratio", "Increase"
         );
+
+        // Print line
         for _ in 0..4 {
-            print!("|{:-<15}", "");
+            print!("|{:-<14}", "");
         }
         println!("|");
 
         // Print table body
         for entry in &self.inner {
             println!(
-                "|{:<15}|{:<15}|{:<15}|{:<15}|",
+                "|{:<14}|{:<14}|{:<14}|{:>12} %|",
                 entry.pallet, entry.extrinsic, entry.ratio, entry.percentage
             );
         }
