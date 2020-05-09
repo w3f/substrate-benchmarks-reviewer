@@ -27,8 +27,10 @@ fn test_overview_table_full_files() -> Result<(), Error> {
         ("democracy", "delegate", 18.3259, 1732.5924),
     ];
 
-    let mut counter = 0;
     let list = table.list();
+    assert_eq!(list.len(), 5);
+
+    let mut counter = 0;
     for entry in list {
         assert_eq!(entry.0, expected[counter].0);
         assert_eq!(entry.1, expected[counter].1);
@@ -65,8 +67,10 @@ fn test_overview_table_shortened() -> Result<(), Error> {
         ("democracy", "delegate", 19.6006, 1860.0573),
     ];
 
-    let mut counter = 0;
     let list = table.list();
+    assert_eq!(list.len(), 5);
+
+    let mut counter = 0;
     for entry in list {
         assert_eq!(entry.0, expected[counter].0);
         assert_eq!(entry.1, expected[counter].1);
