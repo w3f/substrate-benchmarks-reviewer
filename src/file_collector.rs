@@ -30,27 +30,28 @@ impl FileCollector {
     /// saving those internally.
     pub fn new<P: AsRef<Path>>(path: P) -> Result<FileCollector, Error> {
         Ok(FileCollector {
-            files: Self::find_files(path)?,
+            files: find_files(path)?,
             count: 0,
         })
     }
-    /// Searches for files insides the specified `path` and collects all file paths.
-    /// If a directory is found, this function will repeat that same process for that
-    /// subdirectory (recursion).
-    fn find_files<P: AsRef<Path>>(path: P) -> Result<Vec<PathBuf>, Error> {
-        let mut coll = Vec::new();
+}
 
-        for entry in fs::read_dir(path)? {
-            let path = entry?.path();
-            if path.is_dir() {
-                coll.append(&mut Self::find_files(&path)?);
-            } else {
-                coll.push(path);
-            }
+/// Searches for files insides the specified `path` and saves the full path of each file.
+/// If a directory is found, this function will repeat that same process for that
+/// subdirectory (recursion).
+fn find_files<P: AsRef<Path>>(path: P) -> Result<Vec<PathBuf>, Error> {
+    let mut coll = Vec::new();
+
+    for entry in fs::read_dir(path)? {
+        let path = entry?.path();
+        if path.is_dir() {
+            coll.append(&mut find_files(&path)?);
+        } else {
+            coll.push(path);
         }
-
-        Ok(coll)
     }
+
+    Ok(coll)
 }
 
 /// Read file directly to memory. The output of an individual benchmark
