@@ -176,7 +176,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{FileContent, ExtrinsicResult};
+    use crate::{ExtrinsicResult, FileContent};
 
     #[test]
     fn test_parse_header() {
@@ -188,28 +188,28 @@ mod tests {
                     r#"u,e,extrinsic_time,storage_root_time"#,
                 ),
                 // -> output to be tested
-                ("balances", "set_balance", 10, 10, vec!["u", "e"])
+                ("balances", "set_balance", 10, 10, vec!["u", "e"]),
             ),
             (
                 (
                     r#"Pallet: "democracy", Extrinsic: "delegate", Lowest values: [], Highest values: [], Steps: [10], Repeat: 10"#,
-                    r#"r,extrinsic_time,storage_root_time"#
+                    r#"r,extrinsic_time,storage_root_time"#,
                 ),
-                ("democracy", "delegate", 10, 10, vec!["r"])
+                ("democracy", "delegate", 10, 10, vec!["r"]),
             ),
             (
                 (
                     r#"Pallet: "democracy", Extrinsic: "proxy_undelegate", Lowest values: [], Highest values: [], Steps: [20], Repeat: 20"#,
-                    r#"r,extrinsic_time,storage_root_time"#
+                    r#"r,extrinsic_time,storage_root_time"#,
                 ),
-                ("democracy", "proxy_undelegate", 20, 20, vec!["r"])
+                ("democracy", "proxy_undelegate", 20, 20, vec!["r"]),
             ),
             (
                 (
                     r#"Pallet: "identity", Extrinsic: "cancel_request", Lowest values: [], Highest values: [], Steps: [20], Repeat: 20"#,
-                    r#"r,x,extrinsic_time,storage_root_time"#
+                    r#"r,x,extrinsic_time,storage_root_time"#,
                 ),
-                ("identity", "cancel_request", 20, 20, vec!["r", "x"])
+                ("identity", "cancel_request", 20, 20, vec!["r", "x"]),
             ),
         ];
 
@@ -233,28 +233,25 @@ mod tests {
     fn test_parse_body() {
         let test_data = [
             (
-                (
-                    "header1 ... (skipped)\n\
+                ("header1 ... (skipped)\n\
                     header2 ... (skpped)\n\
                     1,100,409567,85176\n\
                     1,100,404202,95485\n\
                     1,100,436160,89604\n\
                     1,100,443911,106889\n\
                     1,100,441193,93017\n\
-                    1,100,419524,94390"
-                ),
+                    1,100,419524,94390"),
                 vec![
-                    vec![1,100,409567,85176],
-                    vec![1,100,404202,95485],
-                    vec![1,100,436160,89604],
-                    vec![1,100,443911,106889],
-                    vec![1,100,441193,93017],
-                    vec![1,100,419524,94390]
-                ]
+                    vec![1, 100, 409567, 85176],
+                    vec![1, 100, 404202, 95485],
+                    vec![1, 100, 436160, 89604],
+                    vec![1, 100, 443911, 106889],
+                    vec![1, 100, 441193, 93017],
+                    vec![1, 100, 419524, 94390],
+                ],
             ),
             (
-                (
-                    "header1 ... (skipped)\n\
+                ("header1 ... (skipped)\n\
                     header2 ... (skpped)\n\
                     20,100,416389,88954\n\
                     20,100,411389,88545\n\
@@ -271,38 +268,34 @@ mod tests {
                                 µs\n\
                     \n\
                     Min Squares Analysis\n\
-                    ========"
-
-                ),
+                    ========"),
                 vec![
-                    vec![20,100,416389,88954],
-                    vec![20,100,411389,88545],
-                    vec![20,100,410049,88203],
-                    vec![20,1,127985,70742],
-                    vec![20,1,133206,72225],
-                    vec![20,1,140801,71239]
-                ]
+                    vec![20, 100, 416389, 88954],
+                    vec![20, 100, 411389, 88545],
+                    vec![20, 100, 410049, 88203],
+                    vec![20, 1, 127985, 70742],
+                    vec![20, 1, 133206, 72225],
+                    vec![20, 1, 140801, 71239],
+                ],
             ),
             (
-                (
-                    "header1 ... (skipped)\n\
+                ("header1 ... (skipped)\n\
                     header2 ... (skpped)\n\
                     50,87726,90501\n\
                     50,229949,111762\n\
                     60,96437,87721\n\
                     60,87618,83273\n\
                     60,97325,232905\n\
-                    60,117408,116346"
-                ),
+                    60,117408,116346"),
                 vec![
-                    vec![50,87726,90501],
-                    vec![50,229949,111762],
-                    vec![60,96437,87721],
-                    vec![60,87618,83273],
-                    vec![60,97325,232905],
-                    vec![60,117408,116346]
-                ]
-            )
+                    vec![50, 87726, 90501],
+                    vec![50, 229949, 111762],
+                    vec![60, 96437, 87721],
+                    vec![60, 87618, 83273],
+                    vec![60, 97325, 232905],
+                    vec![60, 117408, 116346],
+                ],
+            ),
         ];
 
         for (content, output) in &test_data {
@@ -316,15 +309,15 @@ mod tests {
 
                 // Hint: the other two values are `extrinsic_time`
                 // and `storage_root_time`
-                assert_eq!(entry.input_vars.len(), expected_len-2);
+                assert_eq!(entry.input_vars.len(), expected_len - 2);
 
                 let current = &output[counter];
-                for i in 0..expected_len-2 {
+                for i in 0..expected_len - 2 {
                     assert_eq!(entry.input_vars[i], current[i]);
                 }
 
-                assert_eq!(entry.extrinsic_time, current[expected_len-2]);
-                assert_eq!(entry.storage_root_time, current[expected_len-1]);
+                assert_eq!(entry.extrinsic_time, current[expected_len - 2]);
+                assert_eq!(entry.storage_root_time, current[expected_len - 1]);
                 counter += 1;
             }
         }
