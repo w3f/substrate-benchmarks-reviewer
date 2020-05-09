@@ -60,7 +60,7 @@ impl ExtrinsicCollection {
     pub fn push(&mut self, result: ExtrinsicResult) {
         self.inner.push(result);
     }
-    pub fn generate_ratio_table(&self) -> RatioTable {
+    pub fn generate_overview_table(&self) -> OverviewTable {
         // find base (lowest value)
         // TODO: Handle unwrap
         let base = self
@@ -74,7 +74,7 @@ impl ExtrinsicCollection {
             .unwrap()
             .average_extrinsic_time();
 
-        let mut table = RatioTable::new();
+        let mut table = OverviewTable::new();
 
         self.inner.iter().for_each(|result| {
             let avg_time = result.average_extrinsic_time();
@@ -91,7 +91,7 @@ impl ExtrinsicCollection {
 }
 
 #[derive(Debug)]
-pub struct RatioTable<'a> {
+pub struct OverviewTable<'a> {
     inner: Vec<RatioEntry<'a>>,
 }
 
@@ -103,9 +103,9 @@ struct RatioEntry<'a> {
     percentage: f64,
 }
 
-impl<'a> RatioTable<'a> {
+impl<'a> OverviewTable<'a> {
     pub fn new() -> Self {
-        RatioTable { inner: Vec::new() }
+        OverviewTable { inner: Vec::new() }
     }
     fn push(&mut self, entry: RatioEntry<'a>) {
         self.inner.push(entry);

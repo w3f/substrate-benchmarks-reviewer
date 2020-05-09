@@ -14,8 +14,7 @@ fn test_overview_table() -> Result<(), Error> {
         collection.push(extrinsic_result);
     }
 
-    let mut table = collection.generate_ratio_table();
-    //println!("TABLE: {:?}", table);
+    let mut table = collection.generate_overview_table();
     table.sort_by_ratio();
     table.print_entries();
 
