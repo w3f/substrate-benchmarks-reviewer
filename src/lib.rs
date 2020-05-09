@@ -4,7 +4,7 @@ mod parser;
 
 pub use file_collector::{FileCollector, FileContent};
 
-use tables::{OverviewTable, TableEntry, StepOverviewTable, StepTableEntry};
+use tables::{OverviewTable, TableEntry, StepOverviewTable, StepTableEntry, SingleStep};
 
 #[macro_use]
 extern crate failure;
@@ -107,26 +107,45 @@ impl ExtrinsicCollection {
     pub fn generate_step_table(&self) -> StepOverviewTable {
         use std::collections::HashMap;
 
-        let mut db: HashMap<(&str, &str, &Vec<u64>), (usize, u64, u64)> = HashMap::new();
+        let mut db: HashMap<(&str, &str), HashMap<&Vec<u64>, (usize, u64, u64)>> = HashMap::new();
 
         for result in &self.inner {
             for entry in &result.repeat_entries {
-                db.entry((&result.pallet, &result.extrinsic, &entry.input_vars))
-                    .and_modify(|(count, extrinsic_time, storage_root_time)| {
-                        *count += 1;
-                        *extrinsic_time += entry.extrinsic_time;
-                        *storage_root_time += entry.storage_root_time;
+                db.entry((&result.pallet, &result.extrinsic))
+                    .and_modify(|step_way| {
+                        step_way.entry(&entry.input_vars)
+                            .and_modify(|(count, extrinsic_time, storage_root_time)| {
+                                *count += 1;
+                                *extrinsic_time += entry.extrinsic_time;
+                                *storage_root_time += entry.storage_root_time;
+                            })
+                            .or_insert((0, 0, 0));
                     })
-                    .or_insert((0, 0, 0));
+                    .or_insert(HashMap::new());
             }
         }
 
-        let mut table = StepOverviewTable;
-        for (key, value) in db {
+        let mut table = StepOverviewTable::new();
+        for ((pallet, extrinsic), value) in db {
+            let mut step = StepTableEntry::default();
+            step.pallet = pallet;
+            step.extrinsic = extrinsic;
 
+            for (input_vars, (count, extrinsic_time, storage_root_time)) in value {
+                step.steps.push(
+                    SingleStep {
+                        input_vars: input_vars,
+                        avg_extrinsic_time: 0.0,
+                        avg_storage_root_time: 0.0,
+                        percentage: 0.0,
+                    }
+                )
+            }
+
+            table.push(step);
         }
 
-        StepOverviewTable::new()
+        table
     }
 }
 

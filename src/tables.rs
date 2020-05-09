@@ -100,15 +100,16 @@ pub struct StepOverviewTable<'a> {
     inner: Vec<StepTableEntry<'a>>
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub(crate) struct StepTableEntry<'a> {
     pub pallet: &'a str,
     pub extrinsic: &'a str,
-    pub steps: Vec<SingleStep>,
+    pub steps: Vec<SingleStep<'a>>,
 }
 
 #[derive(Debug)]
-pub(crate) struct SingleStep {
+pub(crate) struct SingleStep<'a> {
+    pub input_vars: &'a Vec<u64>,
     pub avg_extrinsic_time: f64,
     pub avg_storage_root_time: f64,
     pub percentage: f64,
