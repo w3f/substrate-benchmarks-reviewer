@@ -24,6 +24,8 @@ struct RepeatEntry {
 }
 
 impl ExtrinsicResult {
+    // TODO: Ensure each generated average uses the same amount
+    // of entries as the data it gets compared to.
     fn average_extrinsic_time(&self) -> f64 {
         let mut total = 0;
         self.repeat_entries
