@@ -133,12 +133,19 @@ impl ExtrinsicCollection {
     pub fn generate_step_table(&self) -> StepOverviewTable {
         use std::collections::HashMap;
 
+        // Signature: (pallet, extrinsic) -> ((input vars) -> (count, extrinsic time, storage root time))
         let mut db: HashMap<(&str, &str), HashMap<&Vec<u64>, (usize, u64, u64)>> = HashMap::new();
 
+        // For each extrinsic result...
         for result in &self.inner {
+            // ... and for each of its benchmark step...
             for entry in &result.repeat_entries {
+                // ... create an entry...
                 db.entry((&result.pallet, &result.extrinsic))
                     .and_modify(|step_way| {
+                        // ... and add the measured times of each repeat to the current value,
+                        // identified by the step. Additionally, track the count of measurements
+                        // that were added, in order to calculate the average later on.
                         step_way
                             .entry(&entry.input_vars)
                             .and_modify(|(count, extrinsic_time, storage_root_time)| {
@@ -152,12 +159,14 @@ impl ExtrinsicCollection {
             }
         }
 
+        // Calculate the averages and percentages for each step.
         let mut table = StepOverviewTable::new();
         for ((pallet, extrinsic), value) in db {
             let mut step = StepTableEntry::default();
             step.pallet = pallet;
             step.extrinsic = extrinsic;
 
+            // Calculate the average for each step.
             for (input_vars, (count, extrinsic_time, storage_root_time)) in value {
                 step.steps.push(SingleStep {
                     input_vars: input_vars,
@@ -168,6 +177,7 @@ impl ExtrinsicCollection {
                 })
             }
 
+            // Get the smallest value of extrinsic time measurement.
             let extrinsic_base = step
                 .steps
                 .iter()
@@ -179,6 +189,7 @@ impl ExtrinsicCollection {
                 .unwrap()
                 .avg_extrinsic_time;
 
+            // Get the smallest value of storage root measurement.
             let storage_root_base = step
                 .steps
                 .iter()
@@ -190,6 +201,7 @@ impl ExtrinsicCollection {
                 .unwrap()
                 .avg_storage_root_time;
 
+            // Based on the smallest value, calculate the increase in percentage.
             for entry in &mut step.steps {
                 entry.extrinsic_percentage =
                     ((entry.avg_extrinsic_time / extrinsic_base - 1.0) * 100.0).round_by(4);
