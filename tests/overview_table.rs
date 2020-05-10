@@ -28,7 +28,7 @@ fn test_overview_table_full_files() -> Result<(), Error> {
         ("democracy", "delegate", 1514997.45, 464842.2167, 18.3259, 1732.5924),
     ];
 
-    let list = table.list();
+    let list = table.raw_list();
     assert_eq!(list.len(), 5);
 
     let mut counter = 0;
@@ -71,7 +71,7 @@ fn test_overview_table_shortened() -> Result<(), Error> {
         ("democracy", "delegate", 1501419.6, 464099.8, 19.6006, 1860.0573),
     ];
 
-    let list = table.list();
+    let list = table.raw_list();
     assert_eq!(list.len(), 5);
 
     let mut counter = 0;

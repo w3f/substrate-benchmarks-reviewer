@@ -38,7 +38,7 @@ impl<'a> OverviewTable<'a> {
     ///     ("balances", "transfer", 2.4501, 145.0108),
     /// ];
     /// ```
-    pub fn list(&self) -> Vec<(&str, &str, f64, f64, f64, f64)> {
+    pub fn raw_list(&self) -> Vec<(&str, &str, f64, f64, f64, f64)> {
         self.inner
             .iter()
             .map(|e| {
@@ -122,5 +122,27 @@ impl<'a> StepOverviewTable<'a> {
     }
     pub(crate) fn push(&mut self, entry: StepTableEntry<'a>) {
         self.inner.push(entry);
+    }
+    pub fn raw_list(&self) -> Vec<(&str, &str, &[u64], f64, f64, f64, f64)> {
+        self.inner
+            .iter()
+            .map(|e| {
+                e.steps
+                    .iter()
+                    .map(|s| {
+                        (
+                            e.pallet,
+                            e.extrinsic,
+                            s.input_vars.as_slice(),
+                            s.avg_extrinsic_time,
+                            s.avg_storage_root_time,
+                            s.extrinsic_percentage,
+                            s.storage_root_percentage,
+                        )
+                    })
+                    .collect::<Vec<(&str, &str, &[u64], f64, f64, f64, f64)>>()
+            })
+            .flatten()
+            .collect()
     }
 }

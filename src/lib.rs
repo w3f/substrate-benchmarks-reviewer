@@ -3,8 +3,9 @@ mod parser;
 pub mod tables;
 
 pub use file_collector::{FileCollector, FileContent};
-
 use tables::{OverviewTable, SingleStep, StepOverviewTable, StepTableEntry, TableEntry};
+
+use std::cmp::Ordering;
 
 #[macro_use]
 extern crate failure;
@@ -95,7 +96,9 @@ pub struct ExtrinsicCollection {
 
 impl ExtrinsicCollection {
     pub fn new() -> Self {
-        ExtrinsicCollection { results: Vec::new() }
+        ExtrinsicCollection {
+            results: Vec::new(),
+        }
     }
     pub fn push(&mut self, result: ExtrinsicResult) {
         self.results.push(result);
@@ -109,7 +112,8 @@ impl ExtrinsicCollection {
             .min_by(|x, y| {
                 x.average_extrinsic_time()
                     .partial_cmp(&y.average_extrinsic_time())
-                    .unwrap()
+                    // can occur if there's only one entry
+                    .unwrap_or(Ordering::Equal)
             })
             .unwrap()
             .average_extrinsic_time();
@@ -153,7 +157,7 @@ impl ExtrinsicCollection {
                                 *extrinsic_time += entry.extrinsic_time;
                                 *storage_root_time += entry.storage_root_time;
                             })
-                            .or_insert((0, 0, 0));
+                            .or_insert((1, entry.extrinsic_time, entry.storage_root_time));
                     })
                     .or_insert(HashMap::new());
             }
@@ -173,8 +177,8 @@ impl ExtrinsicCollection {
                 // first.
                 step.steps.push(SingleStep {
                     input_vars: input_vars,
-                    avg_extrinsic_time: extrinsic_time.calc_average(Some(count)),
-                    avg_storage_root_time: storage_root_time.calc_average(Some(count)),
+                    avg_extrinsic_time: extrinsic_time.calc_average(Some(count)).round_by(4),
+                    avg_storage_root_time: storage_root_time.calc_average(Some(count)).round_by(4),
                     extrinsic_percentage: 0.0,
                     storage_root_percentage: 0.0,
                 })
@@ -187,7 +191,8 @@ impl ExtrinsicCollection {
                 .min_by(|x, y| {
                     x.avg_extrinsic_time
                         .partial_cmp(&y.avg_extrinsic_time)
-                        .unwrap()
+                        // can occur if there's only one entry
+                        .unwrap_or(Ordering::Equal)
                 })
                 .unwrap()
                 .avg_extrinsic_time;
@@ -199,7 +204,8 @@ impl ExtrinsicCollection {
                 .min_by(|x, y| {
                     x.avg_storage_root_time
                         .partial_cmp(&y.avg_storage_root_time)
-                        .unwrap()
+                        // can occur if there's only one entry
+                        .unwrap_or(Ordering::Equal)
                 })
                 .unwrap()
                 .avg_storage_root_time;
