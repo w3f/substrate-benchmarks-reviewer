@@ -16,7 +16,7 @@ fn test_step_table() -> Result<(), Error> {
     }
 
     let mut table = collection.generate_step_table();
-    table.sort_by_extrinsic_percentage();
+    table.sort_by_extrinsic_incr_percentage();
     let list = table.raw_list();
 
     for entry in &list {

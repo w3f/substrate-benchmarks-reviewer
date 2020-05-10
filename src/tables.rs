@@ -102,16 +102,16 @@ pub struct StepIncrTable<'a> {
 pub(crate) struct StepIncrTableEntry<'a> {
     pub pallet: &'a str,
     pub extrinsic: &'a str,
-    pub steps_repeats: Vec<StepRepeatIncr<'a>>,
+    pub step_incrs: Vec<StepIncr<'a>>,
 }
 
 #[derive(Debug)]
-pub(crate) struct StepRepeatIncr<'a> {
+pub(crate) struct StepIncr<'a> {
     pub input_vars: &'a Vec<u64>,
     pub avg_extrinsic_time: f64,
     pub avg_storage_root_time: f64,
-    pub extrinsic_percentage: f64,
-    pub storage_root_percentage: f64,
+    pub extrinsic_incr_percentage: f64,
+    pub storage_root_incr_percentage: f64,
 }
 
 impl<'a> StepIncrTable<'a> {
@@ -121,11 +121,11 @@ impl<'a> StepIncrTable<'a> {
     pub(crate) fn push(&mut self, entry: StepIncrTableEntry<'a>) {
         self.entries.push(entry);
     }
-    pub fn sort_by_extrinsic_percentage(&mut self) {
+    pub fn sort_by_extrinsic_incr_percentage(&mut self) {
         for entry in &mut self.entries {
-            entry.steps_repeats.sort_by(|a, b| {
-                b.extrinsic_percentage
-                    .partial_cmp(&a.extrinsic_percentage)
+            entry.step_incrs.sort_by(|a, b| {
+                b.extrinsic_incr_percentage
+                    .partial_cmp(&a.extrinsic_incr_percentage)
                     .unwrap_or(Ordering::Equal)
             });
         }
@@ -153,7 +153,7 @@ impl<'a> StepIncrTable<'a> {
         self.entries
             .iter()
             .map(|e| {
-                e.steps_repeats
+                e.step_incrs
                     .iter()
                     .map(|s| {
                         (
@@ -162,8 +162,8 @@ impl<'a> StepIncrTable<'a> {
                             s.input_vars.as_slice(),
                             s.avg_extrinsic_time,
                             s.avg_storage_root_time,
-                            s.extrinsic_percentage,
-                            s.storage_root_percentage,
+                            s.extrinsic_incr_percentage,
+                            s.storage_root_incr_percentage,
                         )
                     })
                     .collect::<Vec<(&str, &str, &[u64], f64, f64, f64, f64)>>()

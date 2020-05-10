@@ -3,7 +3,7 @@ mod parser;
 pub mod tables;
 
 pub use file_collector::{FileCollector, FileContent};
-use tables::{RatioTable, RatioTableEntry, StepIncrTable, StepIncrTableEntry, StepRepeatIncr};
+use tables::{RatioTable, RatioTableEntry, StepIncrTable, StepIncrTableEntry, StepIncr};
 
 use std::cmp::Ordering;
 
@@ -148,8 +148,9 @@ impl ExtrinsicCollection {
                 db.entry((&result.pallet, &result.extrinsic))
                     .and_modify(|sub_map| {
                         // ... and add the measured times of each repeat to the current value,
-                        // identified by the step. Additionally, track the count of measurements
-                        // that were added, in order to calculate the average later on.
+                        // identified by the step (input vars). Additionally, track the count
+                        // of measurements that were added, in order to calculate the average
+                        // later on.
                         sub_map
                             .entry(&entry.input_vars)
                             .and_modify(|(count, extrinsic_time, storage_root_time)| {
@@ -170,23 +171,23 @@ impl ExtrinsicCollection {
             new_entry.pallet = pallet;
             new_entry.extrinsic = extrinsic;
 
-            // ... and for of its steps
+            // ... and for each of its steps...
             for (input_vars, (count, extrinsic_time, storage_root_time)) in value {
                 // ... calculate the average. The percentages are filled with zeroes
                 // and get adjusted later on, since all averages have to be calculated
                 // first.
-                new_entry.steps_repeats.push(StepRepeatIncr {
+                new_entry.step_incrs.push(StepIncr {
                     input_vars: input_vars,
                     avg_extrinsic_time: extrinsic_time.calc_average(Some(count)).round_by(4),
                     avg_storage_root_time: storage_root_time.calc_average(Some(count)).round_by(4),
-                    extrinsic_percentage: 0.0,
-                    storage_root_percentage: 0.0,
+                    extrinsic_incr_percentage: 0.0,
+                    storage_root_incr_percentage: 0.0,
                 })
             }
 
             // Get the smallest value of extrinsic time measurement.
             let extrinsic_base = new_entry
-                .steps_repeats
+                .step_incrs
                 .iter()
                 .min_by(|x, y| {
                     x.avg_extrinsic_time
@@ -199,7 +200,7 @@ impl ExtrinsicCollection {
 
             // Get the smallest value of storage root measurement.
             let storage_root_base = new_entry
-                .steps_repeats
+                .step_incrs
                 .iter()
                 .min_by(|x, y| {
                     x.avg_storage_root_time
@@ -210,11 +211,11 @@ impl ExtrinsicCollection {
                 .unwrap()
                 .avg_storage_root_time;
 
-            // Based on the smallest value, calculate the increase in percentages.
-            for entry in &mut new_entry.steps_repeats {
-                entry.extrinsic_percentage =
+            // Based on the smallest value, calculate the increase of each step in percentages.
+            for entry in &mut new_entry.step_incrs {
+                entry.extrinsic_incr_percentage =
                     ((entry.avg_extrinsic_time / extrinsic_base - 1.0) * 100.0).round_by(4);
-                entry.storage_root_percentage =
+                entry.storage_root_incr_percentage =
                     ((entry.avg_storage_root_time / storage_root_base - 1.0) * 100.0).round_by(4);
             }
 
