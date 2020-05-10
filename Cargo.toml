@@ -16,4 +16,4 @@ path = "src/bin/main.rs"
 
 [dependencies]
 failure = "0.1.8"
-clap = "2.33.0"
+clap = { version = "2.33.0", features = ["yaml"]}
