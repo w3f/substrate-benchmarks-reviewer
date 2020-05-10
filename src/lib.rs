@@ -159,7 +159,10 @@ impl ExtrinsicCollection {
                     })
                     .or_insert_with(|| {
                         let mut hm = HashMap::new();
-                        hm.insert(&entry.input_vars, (1, entry.extrinsic_time, entry.storage_root_time));
+                        hm.insert(
+                            &entry.input_vars,
+                            (1, entry.extrinsic_time, entry.storage_root_time),
+                        );
                         hm
                     });
             }

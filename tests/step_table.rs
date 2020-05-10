@@ -5,6 +5,7 @@ use analyzer::{ExtrinsicCollection, FileCollector};
 use failure::Error;
 
 #[test]
+#[rustfmt::skip]
 fn test_step_table() -> Result<(), Error> {
     let collector = FileCollector::new("tests/files/steps/")?;
     let mut collection = ExtrinsicCollection::new();
