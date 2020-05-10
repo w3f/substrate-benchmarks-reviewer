@@ -97,7 +97,7 @@ impl<'a> OverviewTable<'a> {
 
 #[derive(Debug)]
 pub struct StepOverviewTable<'a> {
-    inner: Vec<StepTableEntry<'a>>
+    inner: Vec<StepTableEntry<'a>>,
 }
 
 #[derive(Debug, Default)]
@@ -112,7 +112,8 @@ pub(crate) struct SingleStep<'a> {
     pub input_vars: &'a Vec<u64>,
     pub avg_extrinsic_time: f64,
     pub avg_storage_root_time: f64,
-    pub percentage: f64,
+    pub extrinsic_percentage: f64,
+    pub storage_root_percentage: f64,
 }
 
 impl<'a> StepOverviewTable<'a> {

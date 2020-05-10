@@ -1,10 +1,10 @@
 pub mod file_collector;
-pub mod tables;
 mod parser;
+pub mod tables;
 
 pub use file_collector::{FileCollector, FileContent};
 
-use tables::{OverviewTable, TableEntry, StepOverviewTable, StepTableEntry, SingleStep};
+use tables::{OverviewTable, SingleStep, StepOverviewTable, StepTableEntry, TableEntry};
 
 #[macro_use]
 extern crate failure;
@@ -27,6 +27,32 @@ impl RoundBy for f64 {
     fn round_by(&self, by: i32) -> Self {
         let precision = 10.0_f64.powi(by);
         (self * precision).round() / precision
+    }
+}
+
+trait CalculateAverage {
+    fn calc_average(&self, count: Option<usize>) -> f64;
+}
+
+impl CalculateAverage for Vec<u64> {
+    fn calc_average(&self, _: Option<usize>) -> f64 {
+        let mut total = 0;
+
+        for num in self {
+            total += num;
+        }
+
+        total as f64 / self.len() as f64
+    }
+}
+
+impl CalculateAverage for u64 {
+    fn calc_average(&self, count: Option<usize>) -> f64 {
+        if let Some(count) = count {
+            *self as f64 / count as f64
+        } else {
+            *self as f64
+        }
     }
 }
 
@@ -113,7 +139,8 @@ impl ExtrinsicCollection {
             for entry in &result.repeat_entries {
                 db.entry((&result.pallet, &result.extrinsic))
                     .and_modify(|step_way| {
-                        step_way.entry(&entry.input_vars)
+                        step_way
+                            .entry(&entry.input_vars)
                             .and_modify(|(count, extrinsic_time, storage_root_time)| {
                                 *count += 1;
                                 *extrinsic_time += entry.extrinsic_time;
@@ -132,15 +159,45 @@ impl ExtrinsicCollection {
             step.extrinsic = extrinsic;
 
             for (input_vars, (count, extrinsic_time, storage_root_time)) in value {
-                step.steps.push(
-                    SingleStep {
-                        input_vars: input_vars,
-                        avg_extrinsic_time: 0.0,
-                        avg_storage_root_time: 0.0,
-                        percentage: 0.0,
-                    }
-                )
+                step.steps.push(SingleStep {
+                    input_vars: input_vars,
+                    avg_extrinsic_time: extrinsic_time.calc_average(Some(count)),
+                    avg_storage_root_time: storage_root_time.calc_average(Some(count)),
+                    extrinsic_percentage: 0.0,
+                    storage_root_percentage: 0.0,
+                })
             }
+
+            let extrinsic_base = step
+                .steps
+                .iter()
+                .min_by(|x, y| {
+                    x.avg_extrinsic_time
+                        .partial_cmp(&y.avg_extrinsic_time)
+                        .unwrap()
+                })
+                .unwrap()
+                .avg_extrinsic_time;
+
+            let storage_root_base = step
+                .steps
+                .iter()
+                .min_by(|x, y| {
+                    x.avg_storage_root_time
+                        .partial_cmp(&y.avg_storage_root_time)
+                        .unwrap()
+                })
+                .unwrap()
+                .avg_storage_root_time;
+
+            for entry in &mut step.steps {
+                entry.extrinsic_percentage =
+                    ((entry.avg_extrinsic_time / extrinsic_base - 1.0) * 100.0).round_by(4);
+                entry.storage_root_percentage =
+                    ((entry.avg_storage_root_time / storage_root_base - 1.0) * 100.0).round_by(4);
+            }
+
+            //percentage: ((avg_time / base - 1.0) * 100.0).round_by(4),
 
             table.push(step);
         }
@@ -150,6 +207,17 @@ impl ExtrinsicCollection {
 }
 
 /*
+        let base = self
+            .inner
+            .iter()
+            .min_by(|x, y| {
+                x.average_extrinsic_time()
+                    .partial_cmp(&y.average_extrinsic_time())
+                    .unwrap()
+            })
+            .unwrap()
+            .average_extrinsic_time();
+
 #[derive(Debug, Default)]
 pub struct ExtrinsicResult {
     pallet: String,
