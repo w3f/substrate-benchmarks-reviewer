@@ -3,7 +3,7 @@ mod parser;
 pub mod tables;
 
 pub use file_collector::{FileCollector, FileContent};
-use tables::{OverviewTable, SingleStep, StepOverviewTable, StepTableEntry, TableEntry};
+use tables::{RatioTable, RatioTableEntry, StepIncrTable, StepIncrTableEntry, StepRepeatIncr};
 
 use std::cmp::Ordering;
 
@@ -17,11 +17,11 @@ pub struct ExtrinsicResult {
     steps: usize,
     repeats: usize,
     input_var_names: Vec<String>,
-    repeat_entries: Vec<RepeatEntry>,
+    repeat_entries: Vec<StepRepeatEntry>,
 }
 
 #[derive(Debug, Default)]
-struct RepeatEntry {
+struct StepRepeatEntry {
     input_vars: Vec<u64>,
     extrinsic_time: u64,
     storage_root_time: u64,
@@ -103,7 +103,7 @@ impl ExtrinsicCollection {
     pub fn push(&mut self, result: ExtrinsicResult) {
         self.results.push(result);
     }
-    pub fn generate_overview_table(&self) -> OverviewTable {
+    pub fn generate_overview_table(&self) -> RatioTable {
         // find base (lowest value)
         // TODO: Handle unwrap
         let base = self
@@ -118,11 +118,11 @@ impl ExtrinsicCollection {
             .unwrap()
             .average_extrinsic_time();
 
-        let mut table = OverviewTable::new();
+        let mut table = RatioTable::new();
 
         self.results.iter().for_each(|result| {
             let avg_time = result.average_extrinsic_time();
-            table.push(TableEntry {
+            table.push(RatioTableEntry {
                 pallet: &result.pallet,
                 extrinsic: &result.extrinsic,
                 avg_extrinsic_time: avg_time.round_by(4),
@@ -134,7 +134,7 @@ impl ExtrinsicCollection {
 
         table
     }
-    pub fn generate_step_table(&self) -> StepOverviewTable {
+    pub fn generate_step_table(&self) -> StepIncrTable {
         use std::collections::HashMap;
 
         // Signature: (pallet, extrinsic) -> ((input vars) -> (count, extrinsic time, storage root time))
@@ -163,10 +163,10 @@ impl ExtrinsicCollection {
             }
         }
 
-        let mut table = StepOverviewTable::new();
+        let mut table = StepIncrTable::new();
         // For each extrinsic ...
         for ((pallet, extrinsic), value) in db {
-            let mut step = StepTableEntry::default();
+            let mut step = StepIncrTableEntry::default();
             step.pallet = pallet;
             step.extrinsic = extrinsic;
 
@@ -175,7 +175,7 @@ impl ExtrinsicCollection {
                 // ... calculate the average. The percentages are filled with zeroes
                 // and get adjusted later on, since all averages have to be calculated
                 // first.
-                step.steps.push(SingleStep {
+                step.steps.push(StepRepeatIncr {
                     input_vars: input_vars,
                     avg_extrinsic_time: extrinsic_time.calc_average(Some(count)).round_by(4),
                     avg_storage_root_time: storage_root_time.calc_average(Some(count)).round_by(4),

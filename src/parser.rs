@@ -1,4 +1,4 @@
-use super::{file_collector::FileContent, ExtrinsicResult, RepeatEntry};
+use super::{file_collector::FileContent, ExtrinsicResult, StepRepeatEntry};
 
 use failure::Error;
 
@@ -98,7 +98,7 @@ pub(crate) fn parse_header(content: &FileContent) -> Result<ExtrinsicResult, Err
 pub(crate) fn parse_body(
     content: &FileContent,
     expected_len: usize,
-) -> Result<Vec<RepeatEntry>, Error> {
+) -> Result<Vec<StepRepeatEntry>, Error> {
     let mut coll = Vec::new();
     let lines: Vec<&str> = content.0.lines().skip(2).collect();
 
@@ -116,7 +116,7 @@ pub(crate) fn parse_body(
             break;
         }
 
-        let mut repeat_entry = RepeatEntry::default();
+        let mut repeat_entry = StepRepeatEntry::default();
 
         // Fill in the data. The length and conversion validity is checked above,
         // so directly indexing and unwrapping is safe here.

@@ -1,12 +1,12 @@
 use std::cmp::Ordering;
 
 #[derive(Debug)]
-pub struct OverviewTable<'a> {
-    inner: Vec<TableEntry<'a>>,
+pub struct RatioTable<'a> {
+    inner: Vec<RatioTableEntry<'a>>,
 }
 
 #[derive(Debug)]
-pub(crate) struct TableEntry<'a> {
+pub(crate) struct RatioTableEntry<'a> {
     pub pallet: &'a str,
     pub extrinsic: &'a str,
     pub avg_extrinsic_time: f64,
@@ -15,11 +15,11 @@ pub(crate) struct TableEntry<'a> {
     pub percentage: f64,
 }
 
-impl<'a> OverviewTable<'a> {
+impl<'a> RatioTable<'a> {
     pub fn new() -> Self {
-        OverviewTable { inner: Vec::new() }
+        RatioTable { inner: Vec::new() }
     }
-    pub(crate) fn push(&mut self, entry: TableEntry<'a>) {
+    pub(crate) fn push(&mut self, entry: RatioTableEntry<'a>) {
         self.inner.push(entry);
     }
     /// Returns a list of the entries.
@@ -94,19 +94,19 @@ impl<'a> OverviewTable<'a> {
 }
 
 #[derive(Debug)]
-pub struct StepOverviewTable<'a> {
-    inner: Vec<StepTableEntry<'a>>,
+pub struct StepIncrTable<'a> {
+    inner: Vec<StepIncrTableEntry<'a>>,
 }
 
 #[derive(Debug, Default)]
-pub(crate) struct StepTableEntry<'a> {
+pub(crate) struct StepIncrTableEntry<'a> {
     pub pallet: &'a str,
     pub extrinsic: &'a str,
-    pub steps: Vec<SingleStep<'a>>,
+    pub steps: Vec<StepRepeatIncr<'a>>,
 }
 
 #[derive(Debug)]
-pub(crate) struct SingleStep<'a> {
+pub(crate) struct StepRepeatIncr<'a> {
     pub input_vars: &'a Vec<u64>,
     pub avg_extrinsic_time: f64,
     pub avg_storage_root_time: f64,
@@ -114,11 +114,11 @@ pub(crate) struct SingleStep<'a> {
     pub storage_root_percentage: f64,
 }
 
-impl<'a> StepOverviewTable<'a> {
+impl<'a> StepIncrTable<'a> {
     pub fn new() -> Self {
-        StepOverviewTable { inner: Vec::new() }
+        StepIncrTable { inner: Vec::new() }
     }
-    pub(crate) fn push(&mut self, entry: StepTableEntry<'a>) {
+    pub(crate) fn push(&mut self, entry: StepIncrTableEntry<'a>) {
         self.inner.push(entry);
     }
     pub fn sort_by_extrinsic_percentage(&mut self) {
