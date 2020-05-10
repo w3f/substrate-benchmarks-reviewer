@@ -139,8 +139,8 @@ impl ExtrinsicCollection {
 
         // For each extrinsic result...
         for result in &self.results {
-            // ... and for each of its steps...
-            for entry in &result.steps_repeats {
+            // ... and for each of its steps/repeats...
+            for step in &result.steps_repeats {
                 // ... create an entry...
                 db.entry((&result.pallet, &result.extrinsic))
                     .and_modify(|sub_map| {
@@ -149,19 +149,19 @@ impl ExtrinsicCollection {
                         // of measurements that were added, in order to calculate the average
                         // later on.
                         sub_map
-                            .entry(&entry.input_vars)
+                            .entry(&step.input_vars)
                             .and_modify(|(count, extrinsic_time, storage_root_time)| {
                                 *count += 1;
-                                *extrinsic_time += entry.extrinsic_time;
-                                *storage_root_time += entry.storage_root_time;
+                                *extrinsic_time += step.extrinsic_time;
+                                *storage_root_time += step.storage_root_time;
                             })
-                            .or_insert((1, entry.extrinsic_time, entry.storage_root_time));
+                            .or_insert((1, step.extrinsic_time, step.storage_root_time));
                     })
                     .or_insert_with(|| {
                         let mut hm = HashMap::new();
                         hm.insert(
-                            &entry.input_vars,
-                            (1, entry.extrinsic_time, entry.storage_root_time),
+                            &step.input_vars,
+                            (1, step.extrinsic_time, step.storage_root_time),
                         );
                         hm
                     });
