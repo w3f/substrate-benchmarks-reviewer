@@ -1,3 +1,7 @@
+#[macro_use]
+extern crate failure;
+use failure::Error;
+
 pub mod file_collector;
 mod parser;
 pub mod tables;
@@ -6,10 +10,7 @@ pub use file_collector::{FileCollector, FileContent};
 use tables::{RatioTable, RatioTableEntry, StepIncr, StepIncrTable, StepIncrTableEntry};
 
 use std::cmp::Ordering;
-use failure::Error;
-
-#[macro_use]
-extern crate failure;
+use std::collections::HashMap;
 
 #[derive(Debug, Default)]
 pub struct ExtrinsicResult {
@@ -141,8 +142,6 @@ impl ExtrinsicCollection {
         Ok(table)
     }
     pub fn generate_step_table(&self) -> Result<StepIncrTable, Error> {
-        use std::collections::HashMap;
-
         // Signature: (pallet, extrinsic) -> ((input vars) -> (count, extrinsic time, storage root time))
         let mut db: HashMap<(&str, &str), HashMap<&Vec<u64>, (usize, u64, u64)>> = HashMap::new();
 
