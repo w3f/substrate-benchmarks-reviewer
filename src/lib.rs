@@ -179,13 +179,13 @@ impl ExtrinsicCollection {
 
         let mut table = StepIncrTable::new();
         // For each extrinsic ...
-        for ((pallet, extrinsic), value) in db {
+        for ((pallet, extrinsic), data) in db {
             let mut new_entry = StepIncrTableEntry::default();
             new_entry.pallet = pallet;
             new_entry.extrinsic = extrinsic;
 
             // ... and for each of its steps...
-            for (input_vars, (count, extrinsic_time, storage_root_time)) in value {
+            for (input_vars, (count, extrinsic_time, storage_root_time)) in data {
                 // ... calculate the average. The percentages are filled with zeroes
                 // and get adjusted later on, since all averages have to be calculated
                 // first.
