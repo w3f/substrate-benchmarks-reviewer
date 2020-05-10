@@ -110,7 +110,7 @@ impl ExtrinsicCollection {
     pub fn push(&mut self, result: ExtrinsicResult) {
         self.results.push(result);
     }
-    pub fn generate_overview_table(&self) -> Result<RatioTable, Error> {
+    pub fn generate_ratio_table(&self) -> Result<RatioTable, Error> {
         // find base (lowest value)
         // TODO: Handle unwrap
         let base = self

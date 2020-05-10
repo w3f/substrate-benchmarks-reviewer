@@ -1,6 +1,6 @@
-extern crate analyzer;
+extern crate libreviewer;
 
-use analyzer::{ExtrinsicCollection, FileCollector};
+use libreviewer::{ExtrinsicCollection, FileCollector};
 
 use failure::Error;
 

@@ -1,4 +1,4 @@
-use analyzer::FileCollector;
+use libreviewer::FileCollector;
 
 use failure::Error;
 
