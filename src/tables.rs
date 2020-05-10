@@ -130,6 +130,25 @@ impl<'a> StepIncrTable<'a> {
             });
         }
     }
+    /// Returns a list of the entries.
+    ///
+    /// Data ordered as:
+    /// - pallet
+    /// - extrinsic
+    /// - input variables
+    /// - average extrinsic time
+    /// - average storage root time
+    /// - percentage increase of extrinsic time compared to the lowest
+    /// - percentage increase of storage root time compared to the lowest
+    ///
+    /// # Example output:
+    /// ```
+    /// vec![
+    ///     ("balances", "transfer", [892, 1000], 194126.4, 90757.4, 8.4298, 29.2032)
+    ///     ("balances", "transfer", [298, 1000], 190419.6, 87388.7, 6.3594, 24.4075)
+    ///     ("balances", "transfer", [397, 1000], 187451.3, 79826.0, 4.7014, 13.6412)
+    /// ];
+    /// ```
     pub fn raw_list(&self) -> Vec<(&str, &str, &[u64], f64, f64, f64, f64)> {
         self.inner
             .iter()
