@@ -146,11 +146,11 @@ impl ExtrinsicCollection {
             for entry in &result.repeat_entries {
                 // ... create an entry...
                 db.entry((&result.pallet, &result.extrinsic))
-                    .and_modify(|step_way| {
+                    .and_modify(|sub_map| {
                         // ... and add the measured times of each repeat to the current value,
                         // identified by the step. Additionally, track the count of measurements
                         // that were added, in order to calculate the average later on.
-                        step_way
+                        sub_map
                             .entry(&entry.input_vars)
                             .and_modify(|(count, extrinsic_time, storage_root_time)| {
                                 *count += 1;
@@ -166,16 +166,16 @@ impl ExtrinsicCollection {
         let mut table = StepIncrTable::new();
         // For each extrinsic ...
         for ((pallet, extrinsic), value) in db {
-            let mut step = StepIncrTableEntry::default();
-            step.pallet = pallet;
-            step.extrinsic = extrinsic;
+            let mut new_entry = StepIncrTableEntry::default();
+            new_entry.pallet = pallet;
+            new_entry.extrinsic = extrinsic;
 
             // ... and for of its steps
             for (input_vars, (count, extrinsic_time, storage_root_time)) in value {
                 // ... calculate the average. The percentages are filled with zeroes
                 // and get adjusted later on, since all averages have to be calculated
                 // first.
-                step.steps_repeats.push(StepRepeatIncr {
+                new_entry.steps_repeats.push(StepRepeatIncr {
                     input_vars: input_vars,
                     avg_extrinsic_time: extrinsic_time.calc_average(Some(count)).round_by(4),
                     avg_storage_root_time: storage_root_time.calc_average(Some(count)).round_by(4),
@@ -185,7 +185,7 @@ impl ExtrinsicCollection {
             }
 
             // Get the smallest value of extrinsic time measurement.
-            let extrinsic_base = step
+            let extrinsic_base = new_entry
                 .steps_repeats
                 .iter()
                 .min_by(|x, y| {
@@ -198,7 +198,7 @@ impl ExtrinsicCollection {
                 .avg_extrinsic_time;
 
             // Get the smallest value of storage root measurement.
-            let storage_root_base = step
+            let storage_root_base = new_entry
                 .steps_repeats
                 .iter()
                 .min_by(|x, y| {
@@ -211,7 +211,7 @@ impl ExtrinsicCollection {
                 .avg_storage_root_time;
 
             // Based on the smallest value, calculate the increase in percentages.
-            for entry in &mut step.steps_repeats {
+            for entry in &mut new_entry.steps_repeats {
                 entry.extrinsic_percentage =
                     ((entry.avg_extrinsic_time / extrinsic_base - 1.0) * 100.0).round_by(4);
                 entry.storage_root_percentage =
@@ -220,7 +220,7 @@ impl ExtrinsicCollection {
 
             //percentage: ((avg_time / base - 1.0) * 100.0).round_by(4),
 
-            table.push(step);
+            table.push(new_entry);
         }
 
         table
