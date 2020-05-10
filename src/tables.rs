@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 
 #[derive(Debug)]
 pub struct RatioTable<'a> {
-    inner: Vec<RatioTableEntry<'a>>,
+    entries: Vec<RatioTableEntry<'a>>,
 }
 
 #[derive(Debug)]
@@ -17,10 +17,10 @@ pub(crate) struct RatioTableEntry<'a> {
 
 impl<'a> RatioTable<'a> {
     pub fn new() -> Self {
-        RatioTable { inner: Vec::new() }
+        RatioTable { entries: Vec::new() }
     }
     pub(crate) fn push(&mut self, entry: RatioTableEntry<'a>) {
-        self.inner.push(entry);
+        self.entries.push(entry);
     }
     /// Returns a list of the entries.
     ///
@@ -41,7 +41,7 @@ impl<'a> RatioTable<'a> {
     /// ];
     /// ```
     pub fn raw_list(&self) -> Vec<(&str, &str, f64, f64, f64, f64)> {
-        self.inner
+        self.entries
             .iter()
             .map(|e| {
                 (
@@ -56,7 +56,7 @@ impl<'a> RatioTable<'a> {
             .collect()
     }
     pub fn sort_by_ratio(&mut self) {
-        self.inner
+        self.entries
             .sort_by(|a, b| a.ratio.partial_cmp(&b.ratio).unwrap_or(Ordering::Equal));
     }
     pub fn print_entries(&self) {
@@ -79,7 +79,7 @@ impl<'a> RatioTable<'a> {
         println!("|");
 
         // Print table body
-        for entry in &self.inner {
+        for entry in &self.entries {
             println!(
                 "|{:<width$}|{:<width$}|{:<width$}|{:>width_incr$} %|",
                 entry.pallet,
@@ -95,14 +95,14 @@ impl<'a> RatioTable<'a> {
 
 #[derive(Debug)]
 pub struct StepIncrTable<'a> {
-    inner: Vec<StepIncrTableEntry<'a>>,
+    entries: Vec<StepIncrTableEntry<'a>>,
 }
 
 #[derive(Debug, Default)]
 pub(crate) struct StepIncrTableEntry<'a> {
     pub pallet: &'a str,
     pub extrinsic: &'a str,
-    pub steps: Vec<StepRepeatIncr<'a>>,
+    pub steps_repeats: Vec<StepRepeatIncr<'a>>,
 }
 
 #[derive(Debug)]
@@ -116,14 +116,14 @@ pub(crate) struct StepRepeatIncr<'a> {
 
 impl<'a> StepIncrTable<'a> {
     pub fn new() -> Self {
-        StepIncrTable { inner: Vec::new() }
+        StepIncrTable { entries: Vec::new() }
     }
     pub(crate) fn push(&mut self, entry: StepIncrTableEntry<'a>) {
-        self.inner.push(entry);
+        self.entries.push(entry);
     }
     pub fn sort_by_extrinsic_percentage(&mut self) {
-        for entry in &mut self.inner {
-            entry.steps.sort_by(|a, b| {
+        for entry in &mut self.entries {
+            entry.steps_repeats.sort_by(|a, b| {
                 b.extrinsic_percentage
                     .partial_cmp(&a.extrinsic_percentage)
                     .unwrap_or(Ordering::Equal)
@@ -150,10 +150,10 @@ impl<'a> StepIncrTable<'a> {
     /// ];
     /// ```
     pub fn raw_list(&self) -> Vec<(&str, &str, &[u64], f64, f64, f64, f64)> {
-        self.inner
+        self.entries
             .iter()
             .map(|e| {
-                e.steps
+                e.steps_repeats
                     .iter()
                     .map(|s| {
                         (
