@@ -1,0 +1,48 @@
+Pallet: "democracy", Extrinsic: "propose", Lowest values: [], Highest values: [], Steps: [10], Repeat: 10
+p,extrinsic_time,storage_root_time
+1,132678,88456
+1,127539,81875
+1,117496,81847
+10,128729,90816
+10,142714,89832
+10,124988,88706
+10,124805,89603
+10,132519,89567
+19,136500,113575
+19,135354,100269
+
+Median Slopes Analysis
+========
+
+Model:
+Time ~=    121.2
+    + p    0.696
+              µs
+
+Min Squares Analysis
+========
+
+Data points distribution:
+    p   mean µs  sigma µs       %
+    1     121.3      3.19    2.6%
+   10       126     1.372    1.0%
+   19     135.6     0.609    0.4%
+   28     140.6     1.211    0.8%
+   37     147.2      1.46    0.9%
+   46     153.6     3.815    2.4%
+   55     163.5     1.786    1.0%
+   64     164.5     2.042    1.2%
+   73     184.6     12.05    6.5%
+   82     184.4     6.289    3.4%
+   91       182     2.958    1.6%
+  100     187.2     1.365    0.7%
+
+Quality and confidence:
+param     error
+p         0.023
+
+Model:
+Time ~=    121.2
+    + p    0.719
+              µs
+
