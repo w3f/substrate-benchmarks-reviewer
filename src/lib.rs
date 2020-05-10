@@ -19,6 +19,13 @@ pub struct ExtrinsicResult {
     repeat_entries: Vec<RepeatEntry>,
 }
 
+#[derive(Debug, Default)]
+struct RepeatEntry {
+    input_vars: Vec<u64>,
+    extrinsic_time: u64,
+    storage_root_time: u64,
+}
+
 trait RoundBy {
     fn round_by(&self, by: i32) -> Self;
 }
@@ -56,13 +63,6 @@ impl CalculateAverage for u64 {
     }
 }
 
-#[derive(Debug, Default)]
-struct RepeatEntry {
-    input_vars: Vec<u64>,
-    extrinsic_time: u64,
-    storage_root_time: u64,
-}
-
 impl ExtrinsicResult {
     // TODO: Ensure each generated average uses the same amount
     // of entries as the data it gets compared to.
@@ -90,21 +90,21 @@ impl ExtrinsicResult {
 
 #[derive(Debug)]
 pub struct ExtrinsicCollection {
-    inner: Vec<ExtrinsicResult>,
+    results: Vec<ExtrinsicResult>,
 }
 
 impl ExtrinsicCollection {
     pub fn new() -> Self {
-        ExtrinsicCollection { inner: Vec::new() }
+        ExtrinsicCollection { results: Vec::new() }
     }
     pub fn push(&mut self, result: ExtrinsicResult) {
-        self.inner.push(result);
+        self.results.push(result);
     }
     pub fn generate_overview_table(&self) -> OverviewTable {
         // find base (lowest value)
         // TODO: Handle unwrap
         let base = self
-            .inner
+            .results
             .iter()
             .min_by(|x, y| {
                 x.average_extrinsic_time()
@@ -116,7 +116,7 @@ impl ExtrinsicCollection {
 
         let mut table = OverviewTable::new();
 
-        self.inner.iter().for_each(|result| {
+        self.results.iter().for_each(|result| {
             let avg_time = result.average_extrinsic_time();
             table.push(TableEntry {
                 pallet: &result.pallet,
@@ -137,7 +137,7 @@ impl ExtrinsicCollection {
         let mut db: HashMap<(&str, &str), HashMap<&Vec<u64>, (usize, u64, u64)>> = HashMap::new();
 
         // For each extrinsic result...
-        for result in &self.inner {
+        for result in &self.results {
             // ... and for each of its steps...
             for entry in &result.repeat_entries {
                 // ... create an entry...
@@ -220,44 +220,3 @@ impl ExtrinsicCollection {
         table
     }
 }
-
-/*
-        let base = self
-            .inner
-            .iter()
-            .min_by(|x, y| {
-                x.average_extrinsic_time()
-                    .partial_cmp(&y.average_extrinsic_time())
-                    .unwrap()
-            })
-            .unwrap()
-            .average_extrinsic_time();
-
-#[derive(Debug, Default)]
-pub struct ExtrinsicResult {
-    pallet: String,
-    extrinsic: String,
-    steps: usize,
-    repeats: usize,
-    input_var_names: Vec<String>,
-    repeat_entries: Vec<RepeatEntry>,
-}
-
-trait RoundBy {
-    fn round_by(&self, by: i32) -> Self;
-}
-
-impl RoundBy for f64 {
-    fn round_by(&self, by: i32) -> Self {
-        let precision = 10.0_f64.powi(by);
-        (self * precision).round() / precision
-    }
-}
-
-#[derive(Debug, Default)]
-struct RepeatEntry {
-    input_vars: Vec<u64>,
-    extrinsic_time: u64,
-    storage_root_time: u64,
-}
-*/
