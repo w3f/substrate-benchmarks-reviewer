@@ -17,7 +17,9 @@ pub(crate) struct RatioTableEntry<'a> {
 
 impl<'a> RatioTable<'a> {
     pub fn new() -> Self {
-        RatioTable { entries: Vec::new() }
+        RatioTable {
+            entries: Vec::new(),
+        }
     }
     pub(crate) fn push(&mut self, entry: RatioTableEntry<'a>) {
         self.entries.push(entry);
@@ -116,7 +118,9 @@ pub(crate) struct StepIncr<'a> {
 
 impl<'a> StepIncrTable<'a> {
     pub fn new() -> Self {
-        StepIncrTable { entries: Vec::new() }
+        StepIncrTable {
+            entries: Vec::new(),
+        }
     }
     pub(crate) fn push(&mut self, entry: StepIncrTableEntry<'a>) {
         self.entries.push(entry);

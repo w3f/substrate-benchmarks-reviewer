@@ -3,7 +3,7 @@ mod parser;
 pub mod tables;
 
 pub use file_collector::{FileCollector, FileContent};
-use tables::{RatioTable, RatioTableEntry, StepIncrTable, StepIncrTableEntry, StepIncr};
+use tables::{RatioTable, RatioTableEntry, StepIncr, StepIncrTable, StepIncrTableEntry};
 
 use std::cmp::Ordering;
 
