@@ -157,7 +157,11 @@ impl ExtrinsicCollection {
                             })
                             .or_insert((1, entry.extrinsic_time, entry.storage_root_time));
                     })
-                    .or_insert(HashMap::new());
+                    .or_insert_with(|| {
+                        let mut hm = HashMap::new();
+                        hm.insert(&entry.input_vars, (1, entry.extrinsic_time, entry.storage_root_time));
+                        hm
+                    });
             }
         }
 

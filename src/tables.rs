@@ -126,6 +126,7 @@ impl<'a> StepIncrTable<'a> {
         self.entries.push(entry);
     }
     pub fn sort_by_extrinsic_incr_percentage(&mut self) {
+        // Sort by increase percentages for each extrinsic
         for entry in &mut self.entries {
             entry.step_incrs.sort_by(|a, b| {
                 b.extrinsic_incr_percentage
@@ -133,6 +134,9 @@ impl<'a> StepIncrTable<'a> {
                     .unwrap_or(Ordering::Equal)
             });
         }
+
+        // Additionally, sort by pallet name
+        self.entries.sort_by(|a, b| a.pallet.cmp(b.pallet));
     }
     /// Returns a list of the entries.
     ///

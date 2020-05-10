@@ -74,6 +74,12 @@ fn test_overview_table_shortened() -> Result<(), Error> {
     let list = table.raw_list();
     assert_eq!(list.len(), 5);
 
+    /*
+    for entry in &list {
+        println!("{:?}", entry);
+    }
+    */
+
     let mut counter = 0;
     for entry in list {
         assert_eq!(entry.0, expected[counter].0);
@@ -85,8 +91,6 @@ fn test_overview_table_shortened() -> Result<(), Error> {
 
         counter += 1;
     }
-
-    //table.print_entries();
 
     Ok(())
 }
