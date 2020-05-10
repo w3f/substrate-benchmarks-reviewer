@@ -31,7 +31,7 @@ struct StepRepeatEntry {
 /// number of digits.
 ///
 /// # Example
-/// ```ignore
+/// ```compile_fail
 /// let num: f64 = 15.123456;
 /// assert_eq!(15.1235, num.round_by(4));
 /// ```
@@ -46,18 +46,20 @@ impl RoundBy for f64 {
     }
 }
 
-/// Convenience trait. Calculate average based on TODO.
+/// Convenience trait. Calculate average of `count` items.
+///
+/// # Example
+/// ```compile_fail
+/// let total: u64 = 20;
+/// assert_eq!(5.0, total.calc_average(4));
+/// ```
 trait CalculateAverage {
-    fn calc_average(&self, count: Option<usize>) -> f64;
+    fn calc_average(&self, count: usize) -> f64;
 }
 
 impl CalculateAverage for u64 {
-    fn calc_average(&self, count: Option<usize>) -> f64 {
-        if let Some(count) = count {
-            *self as f64 / count as f64
-        } else {
-            *self as f64
-        }
+    fn calc_average(&self, count: usize) -> f64 {
+        *self as f64 / count as f64
     }
 }
 
@@ -66,23 +68,21 @@ impl ExtrinsicResult {
     // of entries as the data it gets compared to.
     // TODO: Ensure length is never 0.
     fn average_extrinsic_time(&self) -> f64 {
-        let mut total = 0;
         self.repeat_entries
             .iter()
-            .for_each(|e| total += e.extrinsic_time);
-
-        total as f64 / self.repeat_entries.len() as f64
+            .map(|e| e.extrinsic_time)
+            .fold(0, |acc, num| acc + num)
+            .calc_average(self.repeat_entries.len())
     }
     // TODO: Ensure each generated average uses the same amount
     // of entries as the data it gets compared to.
     // TODO: Ensure length is never 0.
     fn average_storage_root_time(&self) -> f64 {
-        let mut total = 0;
         self.repeat_entries
             .iter()
-            .for_each(|e| total += e.storage_root_time);
-
-        total as f64 / self.repeat_entries.len() as f64
+            .map(|e| e.storage_root_time)
+            .fold(0, |acc, num| acc + num)
+            .calc_average(self.repeat_entries.len())
     }
 }
 
@@ -175,8 +175,8 @@ impl ExtrinsicCollection {
                 // first.
                 new_entry.step_incrs.push(StepIncr {
                     input_vars: input_vars,
-                    avg_extrinsic_time: extrinsic_time.calc_average(Some(count)).round_by(4),
-                    avg_storage_root_time: storage_root_time.calc_average(Some(count)).round_by(4),
+                    avg_extrinsic_time: extrinsic_time.calc_average(count).round_by(4),
+                    avg_storage_root_time: storage_root_time.calc_average(count).round_by(4),
                     extrinsic_incr_percentage: 0.0,
                     storage_root_incr_percentage: 0.0,
                 })
@@ -222,5 +222,18 @@ impl ExtrinsicCollection {
         }
 
         table
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_calc_average() {
+        let total = 20;
+        assert_eq!(5.0, total.calc_average(4));
+        assert_eq!(4.0, total.calc_average(5));
+        assert_eq!(0.4, total.calc_average(50));
     }
 }
