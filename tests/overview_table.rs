@@ -9,7 +9,7 @@ use failure::Error;
 /// Tests if it can read the full files as they're generated
 /// by the substrate benchmark binary.
 fn test_overview_table_full_files() -> Result<(), Error> {
-    let collector = FileCollector::new("tests/files/full_files/")?;
+    let collector = FileCollector::new("tests/files/full/")?;
     let mut collection = ExtrinsicCollection::new();
 
     for result in collector {
