@@ -17,7 +17,7 @@ pub struct ExtrinsicResult {
     steps: usize,
     repeats: usize,
     input_var_names: Vec<String>,
-    repeat_entries: Vec<StepRepeatEntry>,
+    steps_repeats: Vec<StepRepeatEntry>,
 }
 
 #[derive(Debug, Default)]
@@ -68,21 +68,21 @@ impl ExtrinsicResult {
     // of entries as the data it gets compared to.
     // TODO: Ensure length is never 0.
     fn average_extrinsic_time(&self) -> f64 {
-        self.repeat_entries
+        self.steps_repeats
             .iter()
             .map(|e| e.extrinsic_time)
             .fold(0, |acc, num| acc + num)
-            .calc_average(self.repeat_entries.len())
+            .calc_average(self.steps_repeats.len())
     }
     // TODO: Ensure each generated average uses the same amount
     // of entries as the data it gets compared to.
     // TODO: Ensure length is never 0.
     fn average_storage_root_time(&self) -> f64 {
-        self.repeat_entries
+        self.steps_repeats
             .iter()
             .map(|e| e.storage_root_time)
             .fold(0, |acc, num| acc + num)
-            .calc_average(self.repeat_entries.len())
+            .calc_average(self.steps_repeats.len())
     }
 }
 
@@ -106,9 +106,9 @@ impl ExtrinsicCollection {
         let base = self
             .results
             .iter()
-            .min_by(|x, y| {
-                x.average_extrinsic_time()
-                    .partial_cmp(&y.average_extrinsic_time())
+            .min_by(|a, b| {
+                a.average_extrinsic_time()
+                    .partial_cmp(&b.average_extrinsic_time())
                     // can occur if there's only one entry
                     .unwrap_or(Ordering::Equal)
             })
@@ -140,7 +140,7 @@ impl ExtrinsicCollection {
         // For each extrinsic result...
         for result in &self.results {
             // ... and for each of its steps...
-            for entry in &result.repeat_entries {
+            for entry in &result.steps_repeats {
                 // ... create an entry...
                 db.entry((&result.pallet, &result.extrinsic))
                     .and_modify(|sub_map| {
@@ -186,9 +186,9 @@ impl ExtrinsicCollection {
             let extrinsic_base = new_entry
                 .step_incrs
                 .iter()
-                .min_by(|x, y| {
-                    x.avg_extrinsic_time
-                        .partial_cmp(&y.avg_extrinsic_time)
+                .min_by(|a, b| {
+                    a.avg_extrinsic_time
+                        .partial_cmp(&b.avg_extrinsic_time)
                         // can occur if there's only one entry
                         .unwrap_or(Ordering::Equal)
                 })
@@ -199,9 +199,9 @@ impl ExtrinsicCollection {
             let storage_root_base = new_entry
                 .step_incrs
                 .iter()
-                .min_by(|x, y| {
-                    x.avg_storage_root_time
-                        .partial_cmp(&y.avg_storage_root_time)
+                .min_by(|a, b| {
+                    a.avg_storage_root_time
+                        .partial_cmp(&b.avg_storage_root_time)
                         // can occur if there's only one entry
                         .unwrap_or(Ordering::Equal)
                 })
