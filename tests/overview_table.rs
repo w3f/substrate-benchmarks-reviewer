@@ -17,7 +17,7 @@ fn test_overview_table_full_files() -> Result<(), Error> {
         collection.push(extrinsic_result);
     }
 
-    let mut table = collection.generate_overview_table();
+    let mut table = collection.generate_overview_table().unwrap();
     table.sort_by_ratio();
 
     let expected = [
@@ -60,7 +60,7 @@ fn test_overview_table_shortened() -> Result<(), Error> {
         collection.push(extrinsic_result);
     }
 
-    let mut table = collection.generate_overview_table();
+    let mut table = collection.generate_overview_table().unwrap();
     table.sort_by_ratio();
 
     let expected = [

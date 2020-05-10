@@ -15,7 +15,7 @@ fn test_step_table() -> Result<(), Error> {
         collection.push(extrinsic_result);
     }
 
-    let mut table = collection.generate_step_table();
+    let mut table = collection.generate_step_table().unwrap();
     table.sort_by_extrinsic_incr_percentage();
 
     let expected = [

@@ -6,6 +6,7 @@ pub use file_collector::{FileCollector, FileContent};
 use tables::{RatioTable, RatioTableEntry, StepIncr, StepIncrTable, StepIncrTableEntry};
 
 use std::cmp::Ordering;
+use failure::Error;
 
 #[macro_use]
 extern crate failure;
@@ -86,6 +87,14 @@ impl ExtrinsicResult {
     }
 }
 
+#[derive(Debug, Fail)]
+enum ExtrinsicCollectionError {
+    #[fail(display = "collection does not contain any results")]
+    EmptyResults,
+}
+
+use ExtrinsicCollectionError::*;
+
 #[derive(Debug)]
 pub struct ExtrinsicCollection {
     results: Vec<ExtrinsicResult>,
@@ -100,7 +109,7 @@ impl ExtrinsicCollection {
     pub fn push(&mut self, result: ExtrinsicResult) {
         self.results.push(result);
     }
-    pub fn generate_overview_table(&self) -> RatioTable {
+    pub fn generate_overview_table(&self) -> Result<RatioTable, Error> {
         // find base (lowest value)
         // TODO: Handle unwrap
         let base = self
@@ -112,7 +121,7 @@ impl ExtrinsicCollection {
                     // can occur if there's only one entry
                     .unwrap_or(Ordering::Equal)
             })
-            .unwrap()
+            .ok_or(EmptyResults)?
             .average_extrinsic_time();
 
         let mut table = RatioTable::new();
@@ -129,9 +138,9 @@ impl ExtrinsicCollection {
             });
         });
 
-        table
+        Ok(table)
     }
-    pub fn generate_step_table(&self) -> StepIncrTable {
+    pub fn generate_step_table(&self) -> Result<StepIncrTable, Error> {
         use std::collections::HashMap;
 
         // Signature: (pallet, extrinsic) -> ((input vars) -> (count, extrinsic time, storage root time))
@@ -199,7 +208,7 @@ impl ExtrinsicCollection {
                         // can occur if there's only one entry
                         .unwrap_or(Ordering::Equal)
                 })
-                .unwrap()
+                .ok_or(EmptyResults)?
                 .avg_extrinsic_time;
 
             // Get the smallest value of storage root measurement.
@@ -212,7 +221,7 @@ impl ExtrinsicCollection {
                         // can occur if there's only one entry
                         .unwrap_or(Ordering::Equal)
                 })
-                .unwrap()
+                .ok_or(EmptyResults)?
                 .avg_storage_root_time;
 
             // Based on the smallest value, calculate the increase of each step in percentages.
@@ -228,7 +237,7 @@ impl ExtrinsicCollection {
             table.push(new_entry);
         }
 
-        table
+        Ok(table)
     }
 }
 
