@@ -138,7 +138,7 @@ impl ExtrinsicCollection {
 
         // For each extrinsic result...
         for result in &self.inner {
-            // ... and for each of its benchmark step...
+            // ... and for each of its steps...
             for entry in &result.repeat_entries {
                 // ... create an entry...
                 db.entry((&result.pallet, &result.extrinsic))
@@ -159,15 +159,18 @@ impl ExtrinsicCollection {
             }
         }
 
-        // Calculate the averages and percentages for each step.
         let mut table = StepOverviewTable::new();
+        // For each extrinsic ...
         for ((pallet, extrinsic), value) in db {
             let mut step = StepTableEntry::default();
             step.pallet = pallet;
             step.extrinsic = extrinsic;
 
-            // Calculate the average for each step.
+            // ... and for of its steps
             for (input_vars, (count, extrinsic_time, storage_root_time)) in value {
+                // ... calculate the average. The percentages are filled with zeroes
+                // and get adjusted later on, since all averages have to be calculated
+                // first.
                 step.steps.push(SingleStep {
                     input_vars: input_vars,
                     avg_extrinsic_time: extrinsic_time.calc_average(Some(count)),
@@ -201,7 +204,7 @@ impl ExtrinsicCollection {
                 .unwrap()
                 .avg_storage_root_time;
 
-            // Based on the smallest value, calculate the increase in percentage.
+            // Based on the smallest value, calculate the increase in percentages.
             for entry in &mut step.steps {
                 entry.extrinsic_percentage =
                     ((entry.avg_extrinsic_time / extrinsic_base - 1.0) * 100.0).round_by(4);
