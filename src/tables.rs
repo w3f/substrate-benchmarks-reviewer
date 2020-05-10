@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 #[derive(Debug)]
 pub struct OverviewTable<'a> {
     inner: Vec<TableEntry<'a>>,
@@ -54,12 +56,8 @@ impl<'a> OverviewTable<'a> {
             .collect()
     }
     pub fn sort_by_ratio(&mut self) {
-        // TODO: Handle unwrap
         self.inner
-            .sort_by(|a, b| a.ratio.partial_cmp(&b.ratio).unwrap());
-    }
-    pub fn sort_by_pallet(&mut self) {
-        // TODO...
+            .sort_by(|a, b| a.ratio.partial_cmp(&b.ratio).unwrap_or(Ordering::Equal));
     }
     pub fn print_entries(&self) {
         let width = 14;
@@ -122,6 +120,15 @@ impl<'a> StepOverviewTable<'a> {
     }
     pub(crate) fn push(&mut self, entry: StepTableEntry<'a>) {
         self.inner.push(entry);
+    }
+    pub fn sort_by_extrinsic_percentage(&mut self) {
+        for entry in &mut self.inner {
+            entry.steps.sort_by(|a, b| {
+                b.extrinsic_percentage
+                    .partial_cmp(&a.extrinsic_percentage)
+                    .unwrap_or(Ordering::Equal)
+            });
+        }
     }
     pub fn raw_list(&self) -> Vec<(&str, &str, &[u64], f64, f64, f64, f64)> {
         self.inner
