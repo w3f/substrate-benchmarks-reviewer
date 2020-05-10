@@ -27,6 +27,14 @@ struct StepRepeatEntry {
     storage_root_time: u64,
 }
 
+/// Convenience trait. Round based on the specified
+/// number of digits.
+///
+/// # Example
+/// ```ignore
+/// let num: f64 = 15.123456;
+/// assert_eq!(15.1235, num.round_by(4));
+/// ```
 trait RoundBy {
     fn round_by(&self, by: i32) -> Self;
 }
@@ -38,20 +46,9 @@ impl RoundBy for f64 {
     }
 }
 
+/// Convenience trait. Calculate average based on TODO.
 trait CalculateAverage {
     fn calc_average(&self, count: Option<usize>) -> f64;
-}
-
-impl CalculateAverage for Vec<u64> {
-    fn calc_average(&self, _: Option<usize>) -> f64 {
-        let mut total = 0;
-
-        for num in self {
-            total += num;
-        }
-
-        total as f64 / self.len() as f64
-    }
 }
 
 impl CalculateAverage for u64 {
