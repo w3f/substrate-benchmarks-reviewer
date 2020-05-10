@@ -6,8 +6,8 @@ use failure::Error;
 
 #[test]
 fn test_step_table() -> Result<(), Error> {
-    //let collector = FileCollector::new("tests/files/shortened_files/")?;
-    let collector = FileCollector::new("tests/files/full_files/")?;
+    let collector = FileCollector::new("tests/files/shortened/")?;
+    //let collector = FileCollector::new("tests/files/full_files/")?;
     let mut collection = ExtrinsicCollection::new();
 
     for result in collector {

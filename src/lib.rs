@@ -31,7 +31,7 @@ struct StepRepeatEntry {
 /// number of digits.
 ///
 /// # Example
-/// ```compile_fail
+/// ```ignore
 /// let num: f64 = 15.123456;
 /// assert_eq!(15.1235, num.round_by(4));
 /// ```
@@ -49,7 +49,7 @@ impl RoundBy for f64 {
 /// Convenience trait. Calculate average of `count` items.
 ///
 /// # Example
-/// ```compile_fail
+/// ```ignore
 /// let total: u64 = 20;
 /// assert_eq!(5.0, total.calc_average(4));
 /// ```

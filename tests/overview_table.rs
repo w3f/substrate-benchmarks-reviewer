@@ -52,7 +52,7 @@ fn test_overview_table_full_files() -> Result<(), Error> {
 #[rustfmt::skip]
 /// Test shortened files, where the expected results have been re-calculated by hand.
 fn test_overview_table_shortened() -> Result<(), Error> {
-    let collector = FileCollector::new("tests/files/shortened_files/")?;
+    let collector = FileCollector::new("tests/files/shortened/")?;
     let mut collection = ExtrinsicCollection::new();
 
     for result in collector {
