@@ -8,6 +8,8 @@ enum AnalyserError {
     MissingHeader,
     #[fail(display = "header value of the benchmark result is invalid")]
     InvalidHeader,
+    #[fail(display = "body of the benchmark result is invalid")]
+    InvalidBody,
 }
 
 use self::AnalyserError::*;
@@ -121,13 +123,13 @@ pub(crate) fn parse_body(
         // Fill in the data. The length and conversion validity is checked above,
         // so directly indexing and unwrapping is safe here.
         let temp: Vec<&&str> = parts.iter().rev().take(2).collect();
-        repeat_entry.storage_root_time = temp[0].parse::<u64>().unwrap();
-        repeat_entry.extrinsic_time = temp[1].parse::<u64>().unwrap();
+        repeat_entry.storage_root_time = temp[0].parse::<u64>().map_err(|_| InvalidBody)?;
+        repeat_entry.extrinsic_time = temp[1].parse::<u64>().map_err(|_| InvalidBody)?;
         repeat_entry.input_vars = parts
             .iter()
             .take(expected_len - 2)
-            .map(|p| p.parse::<u64>().unwrap())
-            .collect();
+            .map(|p| p.parse::<u64>())
+            .collect::<Result<Vec<u64>, _>>()?;
 
         coll.push(repeat_entry);
     }
