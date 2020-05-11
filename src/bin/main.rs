@@ -1,5 +1,3 @@
-#[macro_use]
-extern crate clap;
 use clap::{App, Arg, SubCommand};
 use failure::Error;
 

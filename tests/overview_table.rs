@@ -43,8 +43,6 @@ fn test_overview_table_full_files() -> Result<(), Error> {
         counter += 1;
     }
 
-    //table.print_entries();
-
     Ok(())
 }
 

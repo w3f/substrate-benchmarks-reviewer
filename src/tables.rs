@@ -61,38 +61,6 @@ impl<'a> RatioTable<'a> {
         self.entries
             .sort_by(|a, b| a.ratio.partial_cmp(&b.ratio).unwrap_or(Ordering::Equal));
     }
-    pub fn print_entries(&self) {
-        let width = 14;
-
-        // Print table header
-        println!(
-            "|{:^width$}|{:^width$}|{:^width$}|{:^width$}|",
-            "Pallet",
-            "Extrinsic",
-            "Ratio",
-            "Increase",
-            width = width
-        );
-
-        // Print line
-        for _ in 0..4 {
-            print!("|{:-<width$}", "", width = width);
-        }
-        println!("|");
-
-        // Print table body
-        for entry in &self.entries {
-            println!(
-                "|{:<width$}|{:<width$}|{:<width$}|{:>width_incr$} %|",
-                entry.pallet,
-                entry.extrinsic,
-                entry.ratio,
-                entry.percentage,
-                width = width,
-                width_incr = width - 2
-            );
-        }
-    }
 }
 
 #[derive(Debug)]
