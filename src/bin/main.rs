@@ -27,6 +27,7 @@ fn main() -> Result<(), Error> {
         .get_matches();
 
     if let Some(matches) = matches.subcommand_matches("ratio") {
+        // Unwrapping is ok, since "PATH" is set to required
         let collection = build_collection(matches.value_of("PATH").unwrap())?;
 
         let mut table = collection.generate_ratio_table()?;
@@ -38,6 +39,7 @@ fn main() -> Result<(), Error> {
     }
 
     if let Some(matches) = matches.subcommand_matches("step") {
+        // Unwrapping is ok, since "PATH" is set to required
         let collection = build_collection(matches.value_of("PATH").unwrap())?;
 
         let mut table = collection.generate_step_table()?;

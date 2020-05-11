@@ -66,9 +66,6 @@ impl CalculateAverage for u64 {
 }
 
 impl ExtrinsicResult {
-    // TODO: Ensure each generated average uses the same amount
-    // of entries as the data it gets compared to.
-    // TODO: Ensure length is never 0.
     fn average_extrinsic_time(&self) -> f64 {
         self.steps_repeats
             .iter()
@@ -76,9 +73,6 @@ impl ExtrinsicResult {
             .fold(0, |acc, num| acc + num)
             .calc_average(self.steps_repeats.len())
     }
-    // TODO: Ensure each generated average uses the same amount
-    // of entries as the data it gets compared to.
-    // TODO: Ensure length is never 0.
     fn average_storage_root_time(&self) -> f64 {
         self.steps_repeats
             .iter()
@@ -111,8 +105,11 @@ impl ExtrinsicCollection {
         self.results.push(result);
     }
     pub fn generate_ratio_table(&self) -> Result<RatioTable, Error> {
+        if self.results.is_empty() {
+            return Err(EmptyResults)
+        }
+
         // find base (lowest value)
-        // TODO: Handle unwrap
         let base = self
             .results
             .iter()
@@ -142,6 +139,10 @@ impl ExtrinsicCollection {
         Ok(table)
     }
     pub fn generate_step_table(&self) -> Result<StepIncrTable, Error> {
+        if self.results.is_empty() {
+            return Err(EmptyResults)
+        }
+
         // Signature: (pallet, extrinsic) -> ((input vars) -> (count, extrinsic time, storage root time))
         let mut db: HashMap<(&str, &str), HashMap<&Vec<u64>, (usize, u64, u64)>> = HashMap::new();
 
