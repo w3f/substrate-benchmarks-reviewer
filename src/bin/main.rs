@@ -34,19 +34,22 @@ fn main() -> Result<(), Error> {
             SubCommand::with_name("ratio")
                 .arg(Arg::with_name("PATH").required(true))
                 .arg(Arg::with_name("csv").long("csv"))
-                .arg(Arg::with_name("skip-warnings").long("skip-warnings"))
+                .arg(Arg::with_name("skip-warnings").long("skip-warnings")),
         )
         .subcommand(
             SubCommand::with_name("step")
                 .arg(Arg::with_name("PATH").required(true))
                 .arg(Arg::with_name("csv").long("csv"))
-                .arg(Arg::with_name("skip-warnings").long("skip-warnings"))
+                .arg(Arg::with_name("skip-warnings").long("skip-warnings")),
         )
         .get_matches();
 
     if let Some(matches) = matches.subcommand_matches("ratio") {
         // Unwrapping is ok, since "PATH" is set to required
-        let collection = build_collection(matches.value_of("PATH").unwrap(), matches.is_present("skip-warnings"))?;
+        let collection = build_collection(
+            matches.value_of("PATH").unwrap(),
+            matches.is_present("skip-warnings"),
+        )?;
 
         let mut table = collection.generate_ratio_table()?;
         table.sort_by_ratio();
@@ -60,7 +63,10 @@ fn main() -> Result<(), Error> {
 
     if let Some(matches) = matches.subcommand_matches("step") {
         // Unwrapping is ok, since "PATH" is set to required
-        let collection = build_collection(matches.value_of("PATH").unwrap(), matches.is_present("skip-warnings"))?;
+        let collection = build_collection(
+            matches.value_of("PATH").unwrap(),
+            matches.is_present("skip-warnings"),
+        )?;
 
         let mut table = collection.generate_step_table()?;
         table.sort_by_extrinsic_incr_percentage();
