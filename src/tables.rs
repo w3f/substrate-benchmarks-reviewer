@@ -1,4 +1,7 @@
+use prettytable::{Cell, Row, Table};
+
 use std::cmp::Ordering;
+use std::io::stdout;
 
 #[derive(Debug)]
 pub struct RatioTable<'a> {
@@ -23,6 +26,10 @@ impl<'a> RatioTable<'a> {
     }
     pub(crate) fn push(&mut self, entry: RatioTableEntry<'a>) {
         self.entries.push(entry);
+    }
+    pub fn sort_by_ratio(&mut self) {
+        self.entries
+            .sort_by(|a, b| a.ratio.partial_cmp(&b.ratio).unwrap_or(Ordering::Equal));
     }
     /// Returns a list of the entries.
     ///
@@ -57,9 +64,32 @@ impl<'a> RatioTable<'a> {
             })
             .collect()
     }
-    pub fn sort_by_ratio(&mut self) {
-        self.entries
-            .sort_by(|a, b| a.ratio.partial_cmp(&b.ratio).unwrap_or(Ordering::Equal));
+    fn build_table(&self) -> prettytable::Table {
+        let mut table = prettytable::Table::new();
+
+        // Header
+        table.add_row(row![
+            bc =>
+            "Pallet",
+            "Extrinsic",
+            "Avg. Extrinsic Time",
+            "Avg. Storage Root Time",
+            "Ratio",
+            "Ration in %"
+        ]);
+
+        // Body
+        for entry in self.raw_list() {
+            table.add_row(row![entry.0, entry.1, entry.2, entry.3, entry.4, entry.5,]);
+        }
+
+        table
+    }
+    pub fn print(&self) {
+        self.build_table().printstd();
+    }
+    pub fn print_csv(&self) {
+        self.build_table().to_csv(stdout()).unwrap();
     }
 }
 
@@ -146,5 +176,53 @@ impl<'a> StepIncrTable<'a> {
             })
             .flatten()
             .collect()
+    }
+    fn build_table(&self) -> prettytable::Table {
+        fn display_slice(slice: &[u64]) -> String {
+            let mut s = String::new();
+
+            for i in slice {
+                s.push_str(&format!("{}, ", i));
+            }
+
+            s.pop(); // remove whitespace
+            s.pop(); // remove comma
+            s
+        }
+
+        let mut table = prettytable::Table::new();
+
+        // Header
+        table.add_row(row![
+            bc =>
+            "Pallet",
+            "Extrinsic",
+            "Variables",
+            "Avg. Extrinsic Time",
+            "Avg. Storage Root Time",
+            "Extrinsic Time Increase",
+            "Storage Root Time Increase"
+        ]);
+
+        // Body
+        for entry in self.raw_list() {
+            table.add_row(row![
+                entry.0,
+                entry.1,
+                display_slice(entry.2),
+                entry.3,
+                entry.4,
+                entry.5,
+                entry.6,
+            ]);
+        }
+
+        table
+    }
+    pub fn print(&self) {
+        self.build_table().printstd();
+    }
+    pub fn print_csv(&self) {
+        self.build_table().to_csv(stdout()).unwrap();
     }
 }

@@ -20,8 +20,16 @@ fn main() -> Result<(), Error> {
         .version("1.0")
         .author("Fabio Lama <github.com/lamafab>")
         .about("Creates overview tables of substrate module benchmarks.")
-        .subcommand(SubCommand::with_name("ratio").arg(Arg::with_name("PATH").required(true)))
-        .subcommand(SubCommand::with_name("step").arg(Arg::with_name("PATH").required(true)))
+        .subcommand(
+            SubCommand::with_name("ratio")
+                .arg(Arg::with_name("PATH").required(true))
+                .arg(Arg::with_name("csv").long("csv")),
+        )
+        .subcommand(
+            SubCommand::with_name("step")
+                .arg(Arg::with_name("PATH").required(true))
+                .arg(Arg::with_name("csv").long("csv")),
+        )
         .get_matches();
 
     if let Some(matches) = matches.subcommand_matches("ratio") {
@@ -31,8 +39,10 @@ fn main() -> Result<(), Error> {
         let mut table = collection.generate_ratio_table()?;
         table.sort_by_ratio();
 
-        for entry in &table.raw_list() {
-            println!("{:?}", entry);
+        if matches.is_present("csv") {
+            table.print_csv();
+        } else {
+            table.print();
         }
     }
 
@@ -43,8 +53,10 @@ fn main() -> Result<(), Error> {
         let mut table = collection.generate_step_table()?;
         table.sort_by_extrinsic_incr_percentage();
 
-        for entry in &table.raw_list() {
-            println!("{:?}", entry);
+        if matches.is_present("csv") {
+            table.print_csv();
+        } else {
+            table.print();
         }
     }
 

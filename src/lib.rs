@@ -1,12 +1,14 @@
 #[macro_use]
 extern crate failure;
 use failure::Error;
+#[macro_use]
+extern crate prettytable;
 
 pub mod filescraper;
 mod parser;
 pub mod tables;
 
-pub use filescraper::{FileScraper, FileContent};
+pub use filescraper::{FileContent, FileScraper};
 use tables::{RatioTable, RatioTableEntry, StepIncr, StepIncrTable, StepIncrTableEntry};
 
 use std::cmp::Ordering;
@@ -106,7 +108,7 @@ impl ExtrinsicCollection {
     }
     pub fn generate_ratio_table(&self) -> Result<RatioTable, Error> {
         if self.results.is_empty() {
-            return Err(EmptyResults.into())
+            return Err(EmptyResults.into());
         }
 
         // find base (lowest value)
@@ -140,7 +142,7 @@ impl ExtrinsicCollection {
     }
     pub fn generate_step_table(&self) -> Result<StepIncrTable, Error> {
         if self.results.is_empty() {
-            return Err(EmptyResults.into())
+            return Err(EmptyResults.into());
         }
 
         // Signature: (pallet, extrinsic) -> ((input vars) -> (count, extrinsic time, storage root time))
