@@ -1,7 +1,7 @@
 use clap::{App, Arg, SubCommand};
 use failure::Error;
 
-use libreviewer::{ExtrinsicCollection, FileScraper};
+use libreview::{ExtrinsicCollection, FileScraper};
 
 fn build_collection(path: &str, skip_warn: bool) -> Result<ExtrinsicCollection, Error> {
     let scraper = FileScraper::new(path)?;
@@ -26,7 +26,7 @@ fn build_collection(path: &str, skip_warn: bool) -> Result<ExtrinsicCollection, 
 }
 
 fn main() -> Result<(), Error> {
-    let matches = App::new("bench-reviewer")
+    let matches = App::new("bench-review")
         .version("1.0")
         .author("Fabio Lama <github.com/lamafab>")
         .about("Creates overview tables of substrate module benchmarks.")
