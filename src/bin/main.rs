@@ -8,8 +8,16 @@ fn build_collection(path: &str) -> Result<ExtrinsicCollection, Error> {
     let mut collection = ExtrinsicCollection::new();
 
     for result in scraper {
-        let extrinsic_result = result?.parse()?;
-        collection.push(extrinsic_result);
+        result?
+            .parse()
+            .map(|result| {
+                collection.push(result);
+                ()
+            })
+            .map_err(|err| {
+                eprintln!("Warn: {}", err.to_string());
+                ()
+            });
     }
 
     Ok(collection)

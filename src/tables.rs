@@ -1,5 +1,3 @@
-use prettytable::{Cell, Row, Table};
-
 use std::cmp::Ordering;
 use std::io::stdout;
 

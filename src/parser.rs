@@ -25,7 +25,7 @@ use self::AnalyserError::*;
 pub(crate) fn parse_header(content: &FileContent) -> Result<ExtrinsicResult, Error> {
     let mut extrinsic_result = ExtrinsicResult::default();
 
-    let lines: Vec<&str> = content.0.lines().take(2).collect();
+    let lines: Vec<&str> = (content.0).0.lines().take(2).collect();
 
     // Parse the first line
     {
@@ -102,7 +102,7 @@ pub(crate) fn parse_body(
     expected_len: usize,
 ) -> Result<Vec<StepRepeatEntry>, Error> {
     let mut coll = Vec::new();
-    let lines: Vec<&str> = content.0.lines().skip(2).collect();
+    let lines: Vec<&str> = (content.0).0.lines().skip(2).collect();
 
     for line in lines {
         let parts: Vec<&str> = line.split(",").collect();

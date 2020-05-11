@@ -9,13 +9,23 @@ use std::path::PathBuf;
 
 use failure::Error;
 
-pub struct FileContent(pub(crate) String);
+#[derive(Debug, Fail)]
+enum FileContentError {
+    #[fail(display = "Invalid document: {}", 0)]
+    InvalidDocument(String),
+}
+
+use FileContentError::*;
+
+pub struct FileContent(pub(crate) (String, PathBuf));
 
 impl FileContent {
     pub fn parse(&self) -> Result<ExtrinsicResult, Error> {
-        let mut extrinsic_result = parser::parse_header(self)?;
+        let mut extrinsic_result = parser::parse_header(self)
+            .map_err(|_| InvalidDocument((self.0).1.to_string_lossy().to_string()))?;
         let expected_len = extrinsic_result.input_var_names.len() + 2;
-        extrinsic_result.steps_repeats = parser::parse_body(self, expected_len)?;
+        extrinsic_result.steps_repeats = parser::parse_body(self, expected_len)
+            .map_err(|_| InvalidDocument((self.0).1.to_string_lossy().to_string()))?;
         Ok(extrinsic_result)
     }
 }
@@ -58,10 +68,10 @@ fn find_files<P: AsRef<Path>>(path: P) -> Result<Vec<PathBuf>, Error> {
 /// output is quite small, so reading the full thing will no create any
 /// issues.
 fn read_file<P: AsRef<Path>>(path: P) -> Result<FileContent, Error> {
-    let mut file = File::open(path)?;
+    let mut file = File::open(path.as_ref())?;
     let mut contents = String::new();
     file.read_to_string(&mut contents)?;
-    Ok(FileContent(contents))
+    Ok(FileContent((contents, path.as_ref().to_path_buf())))
 }
 
 impl Iterator for FileScraper {
