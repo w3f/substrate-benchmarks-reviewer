@@ -61,7 +61,7 @@ $ bench-review per-step /path/to/results
 ## TODO
 
 - Also add ratio for storage root time.
-- *step* -> should probably also contain variable names ("u", "r", etc.).
-- A "timeline" review: can compare *ratio* and *step* between days, revealing that some changes in the code have increased (or decreased) execution time.
+- *per-step* -> should probably also contain variable names ("u", "r", etc.).
+- A "timeline" review: can compare *per-extrinsic* and *per-step* between days, revealing that some changes in the code have increased (or decreased) execution time.
 - Document source code some more.
 - Automate "timeline", build a notification service in case something looks off.
