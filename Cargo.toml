@@ -12,7 +12,7 @@ path = "src/lib.rs"
 
 [[bin]]
 name = "bench-review"
-path = "src/bin/main.rs"
+path = "src/main.rs"
 
 [dependencies]
 failure = "0.1.8"
