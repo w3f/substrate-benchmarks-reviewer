@@ -2,9 +2,11 @@
 
 The `bench-review` utility creates overview tables of the substrate runtime benchmarks, allowing for further inspection and adjustments of benchmarking results.
 
-## Install
+## Building
 
-`cargo install --git https://github.com/w3f/substrate-benchmark-reviewer.git`
+```bash
+cargo build --release
+```
 
 ## Usage
 
