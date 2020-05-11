@@ -3,13 +3,13 @@ extern crate clap;
 use clap::{App, Arg, SubCommand};
 use failure::Error;
 
-use libreviewer::{ExtrinsicCollection, FileCollector};
+use libreviewer::{ExtrinsicCollection, FileScraper};
 
 fn build_collection(path: &str) -> Result<ExtrinsicCollection, Error> {
-    let collector = FileCollector::new(path)?;
+    let scraper = FileScraper::new(path)?;
     let mut collection = ExtrinsicCollection::new();
 
-    for result in collector {
+    for result in scraper {
         let extrinsic_result = result?.parse()?;
         collection.push(extrinsic_result);
     }

@@ -1,16 +1,16 @@
 extern crate libreviewer;
 
-use libreviewer::{ExtrinsicCollection, FileCollector};
+use libreviewer::{ExtrinsicCollection, FileScraper};
 
 use failure::Error;
 
 #[test]
 #[rustfmt::skip]
 fn test_step_table() -> Result<(), Error> {
-    let collector = FileCollector::new("tests/files/steps/")?;
+    let scraper = FileScraper::new("tests/files/steps/")?;
     let mut collection = ExtrinsicCollection::new();
 
-    for result in collector {
+    for result in scraper {
         let extrinsic_result = result?.parse()?;
         collection.push(extrinsic_result);
     }

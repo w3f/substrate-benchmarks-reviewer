@@ -2,11 +2,11 @@
 extern crate failure;
 use failure::Error;
 
-pub mod file_collector;
+pub mod filescraper;
 mod parser;
 pub mod tables;
 
-pub use file_collector::{FileCollector, FileContent};
+pub use filescraper::{FileScraper, FileContent};
 use tables::{RatioTable, RatioTableEntry, StepIncr, StepIncrTable, StepIncrTableEntry};
 
 use std::cmp::Ordering;

@@ -20,16 +20,16 @@ impl FileContent {
     }
 }
 
-pub struct FileCollector {
+pub struct FileScraper {
     files: Vec<PathBuf>,
     count: usize,
 }
 
-impl FileCollector {
+impl FileScraper {
     /// Recursively searches for all files within the specified `path`,
     /// saving those internally.
-    pub fn new<P: AsRef<Path>>(path: P) -> Result<FileCollector, Error> {
-        Ok(FileCollector {
+    pub fn new<P: AsRef<Path>>(path: P) -> Result<FileScraper, Error> {
+        Ok(FileScraper {
             files: find_files(path)?,
             count: 0,
         })
@@ -64,7 +64,7 @@ fn read_file<P: AsRef<Path>>(path: P) -> Result<FileContent, Error> {
     Ok(FileContent(contents))
 }
 
-impl Iterator for FileCollector {
+impl Iterator for FileScraper {
     type Item = Result<FileContent, Error>;
 
     fn next(&mut self) -> Option<Self::Item> {

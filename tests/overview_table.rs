@@ -1,6 +1,6 @@
 extern crate libreviewer;
 
-use libreviewer::{ExtrinsicCollection, FileCollector};
+use libreviewer::{ExtrinsicCollection, FileScraper};
 
 use failure::Error;
 
@@ -9,10 +9,10 @@ use failure::Error;
 /// Tests if it can read the full files as they're generated
 /// by the substrate benchmark binary.
 fn test_overview_table_full_files() -> Result<(), Error> {
-    let collector = FileCollector::new("tests/files/full/")?;
+    let scraper = FileScraper::new("tests/files/full/")?;
     let mut collection = ExtrinsicCollection::new();
 
-    for result in collector {
+    for result in scraper {
         let extrinsic_result = result?.parse()?;
         collection.push(extrinsic_result);
     }
@@ -52,10 +52,10 @@ fn test_overview_table_full_files() -> Result<(), Error> {
 #[rustfmt::skip]
 /// Test shortened files, where the expected results have been re-calculated by hand.
 fn test_overview_table_shortened() -> Result<(), Error> {
-    let collector = FileCollector::new("tests/files/shortened/")?;
+    let scraper = FileScraper::new("tests/files/shortened/")?;
     let mut collection = ExtrinsicCollection::new();
 
-    for result in collector {
+    for result in scraper {
         let extrinsic_result = result?.parse()?;
         collection.push(extrinsic_result);
     }

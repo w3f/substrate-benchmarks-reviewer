@@ -1,4 +1,4 @@
-use super::{file_collector::FileContent, ExtrinsicResult, StepRepeatEntry};
+use super::{filescraper::FileContent, ExtrinsicResult, StepRepeatEntry};
 
 use failure::Error;
 
