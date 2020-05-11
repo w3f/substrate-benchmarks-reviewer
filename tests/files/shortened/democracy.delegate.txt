@@ -1,0 +1,43 @@
+Pallet: "democracy", Extrinsic: "delegate", Lowest values: [], Highest values: [], Steps: [10], Repeat: 10
+r,extrinsic_time,storage_root_time
+46,1371361,428904
+46,1345381,430838
+55,1617361,487285
+55,1586626,484212
+55,1586369,489260
+
+Median Slopes Analysis
+========
+
+Model:
+Time ~=    188.8
+    + r    25.97
+              µs
+
+Min Squares Analysis
+========
+
+Data points distribution:
+    r   mean µs  sigma µs       %
+    1     247.5      27.9   11.2%
+   10       477     16.53    3.4%
+   19     738.2     50.98    6.9%
+   28     905.8     7.474    0.8%
+   37      1117     8.985    0.8%
+   46      1358      8.83    0.6%
+   55      1591     6.903    0.4%
+   64      1825     7.678    0.4%
+   73      2070     13.62    0.6%
+   82      2334     13.92    0.5%
+   91      2580     2.746    0.1%
+  100      2834     19.87    0.7%
+
+Quality and confidence:
+param     error
+r          0.14
+
+Model:
+Time ~=    197.3
+    + r    25.92
+              µs
+
