@@ -2,12 +2,12 @@ use std::cmp::Ordering;
 use std::io::stdout;
 
 #[derive(Debug)]
-pub struct RatioTable<'a> {
-    entries: Vec<RatioTableEntry<'a>>,
+pub struct PerExtrTable<'a> {
+    entries: Vec<PerExtrTableEntry<'a>>,
 }
 
 #[derive(Debug)]
-pub(crate) struct RatioTableEntry<'a> {
+pub(crate) struct PerExtrTableEntry<'a> {
     pub pallet: &'a str,
     pub extrinsic: &'a str,
     pub avg_extrinsic_time: f64,
@@ -16,13 +16,13 @@ pub(crate) struct RatioTableEntry<'a> {
     pub percentage: f64,
 }
 
-impl<'a> RatioTable<'a> {
+impl<'a> PerExtrTable<'a> {
     pub fn new() -> Self {
-        RatioTable {
+        PerExtrTable {
             entries: Vec::new(),
         }
     }
-    pub(crate) fn push(&mut self, entry: RatioTableEntry<'a>) {
+    pub(crate) fn push(&mut self, entry: PerExtrTableEntry<'a>) {
         self.entries.push(entry);
     }
     pub fn sort_by_ratio(&mut self) {
@@ -73,7 +73,7 @@ impl<'a> RatioTable<'a> {
             "Avg. Extrinsic\nTime",
             "Avg. Storage\nRoot Time",
             "Extrinsic Time\nRatio (1:x)",
-            "Increase in %"
+            "Extrinsic Time\nIncrease"
         ]);
 
         // Body

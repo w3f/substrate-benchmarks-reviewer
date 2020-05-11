@@ -31,20 +31,20 @@ fn main() -> Result<(), Error> {
         .author("Fabio Lama <github.com/lamafab>")
         .about("Creates overview tables of substrate module benchmarks.")
         .subcommand(
-            SubCommand::with_name("ratio")
+            SubCommand::with_name("per-extrinsic")
                 .arg(Arg::with_name("PATH").required(true))
                 .arg(Arg::with_name("csv").long("csv"))
                 .arg(Arg::with_name("skip-warnings").long("skip-warnings")),
         )
         .subcommand(
-            SubCommand::with_name("step")
+            SubCommand::with_name("per-step")
                 .arg(Arg::with_name("PATH").required(true))
                 .arg(Arg::with_name("csv").long("csv"))
                 .arg(Arg::with_name("skip-warnings").long("skip-warnings")),
         )
         .get_matches();
 
-    if let Some(matches) = matches.subcommand_matches("ratio") {
+    if let Some(matches) = matches.subcommand_matches("per-extrinsic") {
         // Unwrapping is ok, since "PATH" is set to required
         let collection = build_collection(
             matches.value_of("PATH").unwrap(),
@@ -61,7 +61,7 @@ fn main() -> Result<(), Error> {
         }
     }
 
-    if let Some(matches) = matches.subcommand_matches("step") {
+    if let Some(matches) = matches.subcommand_matches("per-step") {
         // Unwrapping is ok, since "PATH" is set to required
         let collection = build_collection(
             matches.value_of("PATH").unwrap(),

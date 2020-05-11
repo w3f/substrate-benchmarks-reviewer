@@ -9,7 +9,7 @@ mod parser;
 pub mod tables;
 
 pub use filescraper::{FileContent, FileScraper};
-use tables::{RatioTable, RatioTableEntry, StepIncr, StepIncrTable, StepIncrTableEntry};
+use tables::{PerExtrTable, PerExtrTableEntry, StepIncr, StepIncrTable, StepIncrTableEntry};
 
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -106,7 +106,7 @@ impl ExtrinsicCollection {
     pub fn push(&mut self, result: ExtrinsicResult) {
         self.results.push(result);
     }
-    pub fn generate_ratio_table(&self) -> Result<RatioTable, Error> {
+    pub fn generate_ratio_table(&self) -> Result<PerExtrTable, Error> {
         if self.results.is_empty() {
             return Err(EmptyResults.into());
         }
@@ -124,11 +124,11 @@ impl ExtrinsicCollection {
             .ok_or(EmptyResults)?
             .average_extrinsic_time();
 
-        let mut table = RatioTable::new();
+        let mut table = PerExtrTable::new();
 
         self.results.iter().for_each(|result| {
             let avg_time = result.average_extrinsic_time();
-            table.push(RatioTableEntry {
+            table.push(PerExtrTableEntry {
                 pallet: &result.pallet,
                 extrinsic: &result.extrinsic,
                 avg_extrinsic_time: avg_time.round_by(4),
