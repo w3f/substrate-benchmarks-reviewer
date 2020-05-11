@@ -8,7 +8,7 @@ fn build_collection(path: &str, skip_warn: bool) -> Result<ExtrinsicCollection, 
     let mut collection = ExtrinsicCollection::new();
 
     for result in scraper {
-        result?
+        let _ = result?
             .parse()
             .map(|result| {
                 collection.push(result);

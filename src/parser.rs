@@ -179,6 +179,7 @@ where
 mod tests {
     use super::*;
     use crate::FileContent;
+    use std::path::PathBuf;
 
     #[test]
     fn test_parse_header() {
@@ -216,7 +217,7 @@ mod tests {
         ];
 
         for ((str1, str2), output) in &test_data {
-            let content = FileContent(format!("{}\n{}", str1, str2));
+            let content = FileContent((format!("{}\n{}", str1, str2), PathBuf::from("")));
             let res = parse_header(&content).unwrap();
             assert_eq!(res.pallet, output.0);
             assert_eq!(res.extrinsic, output.1);
@@ -301,7 +302,7 @@ mod tests {
         ];
 
         for (content, output) in &test_data {
-            let content = FileContent(String::from(*content));
+            let content = FileContent((String::from(*content), PathBuf::from("")));
             let expected_len = output[0].len();
             let res = parse_body(&content, expected_len).unwrap();
 
