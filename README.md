@@ -12,10 +12,10 @@ The `bench-review` utility creates overview tables of the substrate runtime benc
 $ bench-review [SUBCOMMAND] [PATH] [--csv] [--skip-warnings]
 ```
 
-`bench-review` will print warnings if it reads files which are invalid. Those warnings can be suppressed with the `--skip-warnings` flag.
+`bench-review` will print warnings if it reads files which are invalid. Those warnings can be suppressed with the `--skip-warnings` flag. A `--csv` flag is also supported.
 
 ### per-extrinsic
-Calculates the average extrinsic and storage root execution times and displays those in a table. Additionally, each extrinsic displays the ratio of the extrinsic execution time between the fastest benchmark result and its own, including the increase in percentage.
+Calculates the average extrinsic and storage root execution times **of each extrinsic**. Additionally, each extrinsic displays the ratio of the extrinsic execution time between the fastest benchmarking result and its own, including the increase in percentage.
 
 ```bash
 $ bench-review per-extrinsic /path/to/results
@@ -37,7 +37,7 @@ $ bench-review per-extrinsic /path/to/results
 ```
 
 ### per-step
-The benchmarks can contain multiple execution of the same input variables ("repeats"). This review calculates the average extrinsic and storage root execution time of each step and displays the increase from the fastest result to its own in percentage. This review reveals which inputs significantly increase execution time.
+The benchmarks can contain multiple executions of the same input variables ("repeats"). This review calculates the average extrinsic and storage root execution time **of each step** and displays the ratio of the extrinsic execution time between the fastest result (from the same extrinsic) and its own, including the increase in percentage. This review reveals which inputs significantly increase execution time.
 
 ```bash
 $ bench-review per-step /path/to/results
