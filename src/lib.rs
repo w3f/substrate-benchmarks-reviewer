@@ -188,13 +188,14 @@ impl ExtrinsicCollection {
 
             // ... and for each of its steps...
             for (input_vars, (count, extrinsic_time, storage_root_time)) in data {
-                // ... calculate the average. The percentages are filled with zeroes
-                // and get adjusted later on, since all averages have to be calculated
+                // ... calculate the average. Some fields are filled with zeroes and
+                // get adjusted later on, since all averages have to be calculated
                 // first.
                 new_entry.step_incrs.push(StepIncr {
                     input_vars: input_vars,
                     avg_extrinsic_time: extrinsic_time.calc_average(count).round_by(4),
                     avg_storage_root_time: storage_root_time.calc_average(count).round_by(4),
+                    ratio: 0.0,
                     extrinsic_incr_percentage: 0.0,
                     storage_root_incr_percentage: 0.0,
                 })
@@ -228,6 +229,7 @@ impl ExtrinsicCollection {
 
             // Based on the smallest value, calculate the increase of each step in percentages.
             for entry in &mut new_entry.step_incrs {
+                entry.ratio = (entry.avg_extrinsic_time / extrinsic_base).round_by(4);
                 entry.extrinsic_incr_percentage =
                     ((entry.avg_extrinsic_time / extrinsic_base - 1.0) * 100.0).round_by(4);
                 entry.storage_root_incr_percentage =

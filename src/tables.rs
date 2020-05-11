@@ -70,10 +70,10 @@ impl<'a> RatioTable<'a> {
             bc =>
             "Pallet",
             "Extrinsic",
-            "Avg. Extrinsic Time",
-            "Avg. Storage Root Time",
-            "Ratio",
-            "Ration in %"
+            "Avg. Extrinsic\nTime",
+            "Avg. Storage\nRoot Time",
+            "Extrinsic Time\nRatio (1:x)",
+            "Increase in %"
         ]);
 
         // Body
@@ -108,6 +108,7 @@ pub(crate) struct StepIncr<'a> {
     pub input_vars: &'a Vec<u64>,
     pub avg_extrinsic_time: f64,
     pub avg_storage_root_time: f64,
+    pub ratio: f64,
     pub extrinsic_incr_percentage: f64,
     pub storage_root_incr_percentage: f64,
 }
@@ -148,12 +149,12 @@ impl<'a> StepIncrTable<'a> {
     /// # Example output:
     /// ```
     /// vec![
-    ///     ("balances", "transfer", [892, 1000], 194126.4, 90757.4, 8.4298, 29.2032),
-    ///     ("balances", "transfer", [298, 1000], 190419.6, 87388.7, 6.3594, 24.4075),
-    ///     ("balances", "transfer", [397, 1000], 187451.3, 79826.0, 4.7014, 13.6412),
+    ///     ("democracy", "propose", &vec![19], 135927.0, 106922.0, 1.0796, 7.9605, 27.1982),
+    ///     ("democracy", "propose", &vec![10], 130751.0, 89704.8, 1.0385, 3.8495, 6.7160),
+    ///     ("democracy", "propose", &vec![1], 125904.3333, 84059.3333, 1.0, 0.0, 0.0),
     /// ];
     /// ```
-    pub fn raw_list(&self) -> Vec<(&str, &str, &[u64], f64, f64, f64, f64)> {
+    pub fn raw_list(&self) -> Vec<(&str, &str, &[u64], f64, f64, f64, f64, f64)> {
         self.entries
             .iter()
             .map(|e| {
@@ -166,11 +167,12 @@ impl<'a> StepIncrTable<'a> {
                             s.input_vars.as_slice(),
                             s.avg_extrinsic_time,
                             s.avg_storage_root_time,
+                            s.ratio,
                             s.extrinsic_incr_percentage,
                             s.storage_root_incr_percentage,
                         )
                     })
-                    .collect::<Vec<(&str, &str, &[u64], f64, f64, f64, f64)>>()
+                    .collect::<Vec<(&str, &str, &[u64], f64, f64, f64, f64, f64)>>()
             })
             .flatten()
             .collect()
@@ -196,10 +198,11 @@ impl<'a> StepIncrTable<'a> {
             "Pallet",
             "Extrinsic",
             "Variables",
-            "Avg. Extrinsic Time",
-            "Avg. Storage Root Time",
-            "Extrinsic Time Increase",
-            "Storage Root Time Increase"
+            "Avg. Extrinsic\nTime",
+            "Avg. Storage\nRoot Time",
+            "Extrinsic Time\nRatio (1:x)",
+            "Extrinsic Time\nIncrease",
+            "Storage Root Time\nIncrease"
         ]);
 
         // Body
@@ -212,6 +215,7 @@ impl<'a> StepIncrTable<'a> {
                 entry.4,
                 entry.5,
                 entry.6,
+                entry.7,
             ]);
         }
 

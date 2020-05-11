@@ -4,7 +4,7 @@ The `bench-review` utility creates overview tables of the substrate runtime benc
 
 ## Install
 
-`cargo install --git <>
+`cargo install --git https://github.com/w3f/substrate-benchmark-reviewer.git`
 
 ## Usage
 
@@ -15,6 +15,7 @@ Three reviews are supported:
 
 ## TODO
 
+- Also add ratio for storage root time.
 - *step* -> should probably also contain variable names ("u", "r", etc.).
 - A "timeline" review: can compare *ratio* and *step* between days, revealing that some changes in the code have increased (or decreased) execution time.
 - Document source code some more.

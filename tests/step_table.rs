@@ -19,12 +19,12 @@ fn test_step_table() -> Result<(), Error> {
     table.sort_by_extrinsic_incr_percentage();
 
     let expected = [
-        ("balances", "set_balance_killing", &vec![1, 1000], 122488.6667, 79915.0, 15.6470, 27.0004),
-        ("balances", "set_balance_killing", &vec![199, 1000], 108735.6667, 71866.3333, 2.6622, 14.2095),
-        ("balances", "set_balance_killing", &vec![496, 1000], 105916.0, 62925.0, 0.0, 0.0),
-        ("democracy", "propose", &vec![19], 135927.0, 106922.0, 7.9605, 27.1982),
-        ("democracy", "propose", &vec![10], 130751.0, 89704.8, 3.8495, 6.7160),
-        ("democracy", "propose", &vec![1], 125904.3333, 84059.3333, 0.0, 0.0),
+        ("balances", "set_balance_killing", &vec![1, 1000], 122488.6667, 79915.0, 1.1565, 15.6470, 27.0004),
+        ("balances", "set_balance_killing", &vec![199, 1000], 108735.6667, 71866.3333, 1.0266, 2.6622, 14.2095),
+        ("balances", "set_balance_killing", &vec![496, 1000], 105916.0, 62925.0, 1.0, 0.0, 0.0),
+        ("democracy", "propose", &vec![19], 135927.0, 106922.0, 1.0796, 7.9605, 27.1982),
+        ("democracy", "propose", &vec![10], 130751.0, 89704.8, 1.0385, 3.8495, 6.7160),
+        ("democracy", "propose", &vec![1], 125904.3333, 84059.3333, 1.0, 0.0, 0.0),
     ];
 
     let list = table.raw_list();
@@ -44,6 +44,7 @@ fn test_step_table() -> Result<(), Error> {
         assert_eq!(entry.4, expected[counter].4);
         assert_eq!(entry.5, expected[counter].5);
         assert_eq!(entry.6, expected[counter].6);
+        assert_eq!(entry.7, expected[counter].7);
 
         counter += 1;
     }
