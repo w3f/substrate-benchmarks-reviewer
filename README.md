@@ -8,10 +8,55 @@ The `bench-review` utility creates overview tables of the substrate runtime benc
 
 ## Usage
 
-Three reviews are supported:
+```bash
+$ bench-review [SUBCOMMAND] [PATH] [--csv] [--skip-warnings]
+```
 
-- *per-extrinsic*: Calculates the average extrinsic and storage root execution times and displays those in a table. Additionally, each extrinsic displays the ratio of the extrinsic execution time between the fastest benchmark result and its own, including the increase in percentage.
-- *per-step*: The benchmarks can contain multiple execution of the same input variables ("repeats"). This review calculates the average extrinsic and storage root execution time of each step and displays the increase from the fastest result to its own in percentage. This review reveals which inputs significantly increase execution time.
+`bench-review` will print warnings if it reads files which are invalid. Those warnings can be suppressed with the `--skip-warnings` flag.
+
+### per-extrinsic
+Calculates the average extrinsic and storage root execution times and displays those in a table. Additionally, each extrinsic displays the ratio of the extrinsic execution time between the fastest benchmark result and its own, including the increase in percentage.
+
+```bash
+$ bench-review per-extrinsic /path/to/results
+
++-----------+---------------------------+----------------+---------------+----------------+----------------+
+|  Pallet   |         Extrinsic         | Avg. Extrinsic | Avg. Storage  | Extrinsic Time | Extrinsic Time |
+|           |                           |      Time      |   Root Time   |  Ratio (1:x)   |    Increase    |
++-----------+---------------------------+----------------+---------------+----------------+----------------+
+| staking   | set_validator_count       | 4320.8182      | 30835.0455    | 1              | 0              |
++-----------+---------------------------+----------------+---------------+----------------+----------------+
+| utility   | as_sub                    | 4495.0182      | 3525.3364     | 1.0403         | 4.0316         |
++-----------+---------------------------+----------------+---------------+----------------+----------------+
+| staking   | force_new_era_always      | 4558.65        | 31691.4       | 1.055          | 5.5043         |
++-----------+---------------------------+----------------+---------------+----------------+----------------+
+| staking   | force_new_era             | 4624.2         | 33759         | 1.0702         | 7.0214         |
++-----------+---------------------------+----------------+---------------+----------------+----------------+
+| ...       | ...                       | ...            | ...           | ...            | ...            |
++-----------+---------------------------+----------------+---------------+----------------+----------------+
+```
+
+### per-step
+The benchmarks can contain multiple execution of the same input variables ("repeats"). This review calculates the average extrinsic and storage root execution time of each step and displays the increase from the fastest result to its own in percentage. This review reveals which inputs significantly increase execution time.
+
+```bash
+$ bench-review per-step /path/to/results
+
++-----------+---------------------------+---------------+-----------------+----------------+----------------+----------------+-------------------+
+|  Pallet   |         Extrinsic         |   Variables   | Avg. Extrinsic  |  Avg. Storage  | Extrinsic Time | Extrinsic Time | Storage Root Time |
+|           |                           |               |      Time       |   Root Time    |  Ratio (1:x)   |    Increase    |     Increase      |
++-----------+---------------------------+---------------+-----------------+----------------+----------------+----------------+-------------------+
+| balances  | set_balance               | 1, 1000       | 103719          | 74726.5        | 1.1081         | 10.814         | 17.2484           |
++-----------+---------------------------+---------------+-----------------+----------------+----------------+----------------+-------------------+
+| balances  | set_balance               | 1000, 992     | 98291.6         | 69878.7        | 1.0502         | 5.0153         | 9.642             |
++-----------+---------------------------+---------------+-----------------+----------------+----------------+----------------+-------------------+
+| balances  | set_balance               | 1000, 695     | 98031.2         | 70534.7        | 1.0474         | 4.7371         | 10.6713           |
++-----------+---------------------------+---------------+-----------------+----------------+----------------+----------------+-------------------+
+| balances  | set_balance               | 199, 1000     | 97551           | 69578.4        | 1.0422         | 4.224          | 9.1708            |
++-----------+---------------------------+---------------+-----------------+----------------+----------------+----------------+-------------------+
+| ...       | ...                       | ...           | ...             | ...            | ...            | ...            | ...               |
++-----------+---------------------------+---------------+-----------------+----------------+----------------+----------------+-------------------+
+```
 
 ## TODO
 
