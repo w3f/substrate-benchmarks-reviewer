@@ -73,7 +73,7 @@ impl<'a> PerExtrTable<'a> {
             "Avg. Extrinsic\nTime",
             "Avg. Storage\nRoot Time",
             "Extrinsic Time\nRatio (1:x)",
-            "Extrinsic Time\nIncrease"
+            "Extrinsic Time\nIncrease (%)"
         ]);
 
         // Body
@@ -201,8 +201,8 @@ impl<'a> StepIncrTable<'a> {
             "Avg. Extrinsic\nTime",
             "Avg. Storage\nRoot Time",
             "Extrinsic Time\nRatio (1:x)",
-            "Extrinsic Time\nIncrease",
-            "Storage Root Time\nIncrease"
+            "Extrinsic Time\nIncrease (%)",
+            "Storage Root Time\nIncrease (%)"
         ]);
 
         // Body
