@@ -1,6 +1,6 @@
 # Substrate benchmark reviewer
 
-The `bench-review` utility creates overview tables of the substrate runtime benchmarks, allowing for further inspection and adjustments of benchmarking results.
+The `bench-review` utility creates overview tables of the substrate runtime benchmarks, allowing for further inspection and adjustments.
 
 ## Building
 
